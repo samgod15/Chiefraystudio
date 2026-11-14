@@ -1,0 +1,50 @@
+{
+  "name": "Chief Ray Studio",
+  "tagline": "Photography and video by Sam, based in British Columbia.",
+  "description": "Street, portrait, landscape and commercial photography and video by Sam, based in British Columbia.",
+  "site_url": "https://chiefraystudio.com",
+
+  "email": "hello@chiefraystudio.com",
+  "instagram": "chiefraystudio",
+  "phone": "",
+
+  "about": [
+    "I'm Sam, a photographer and videographer based in British Columbia. I shoot street photos downtown, portraits and landscapes, and I work with local businesses on photos and short videos they can actually use.",
+    "If you need listing photos, menu shots or a promo reel, send me a message with what you have in mind and when you need it."
+  ],
+  "services": [
+    "Real estate photos and video",
+    "Food and menu photography",
+    "Portraits",
+    "Events"
+  ],
+
+  "contact_form": {
+    "web3forms_key": "fab16282-8ae0-4341-9dbf-82554ad75246",
+    "reply_time": "within a day",
+    "booking_note": "Booking a few shoots at a portfolio rate this season.",
+    "shoot_types": ["Real estate", "Food and menus", "Portraits", "Events", "Video", "Something else"],
+    "budgets": ["Not sure yet", "Under $250", "$250 to $500", "$500 to $1,000", "Over $1,000"]
+  },
+  "faq": [
+    { "q": "How does pricing work?", "a": "Every shoot is quoted on what you need: time on location, how many edited photos, and whether you want video. Send a message and I'll reply with a quote." },
+    { "q": "Where do you shoot?", "a": "Anywhere in the Lower Mainland. Further out is fine too; travel may be added to the quote." },
+    { "q": "How fast will I get my photos?", "a": "Usually within a week of the shoot. If you need them sooner, ask and I'll tell you what's possible." },
+    { "q": "How many photos will I get?", "a": "It depends on the shoot, and your quote spells it out. Every photo you get is fully edited." },
+    { "q": "Can I use the photos for my business?", "a": "Yes: on your website, social media, menus and listings. For print ads or anything else, mention it in your message." },
+    { "q": "Do you shoot video too?", "a": "Yes. Short promo videos, reels and property walkthroughs." }
+  ],
+
+  "nav_style": "path",
+  "show_camera_settings": true,
+  "share_photo": "",
+
+  "categories": [
+    { "folder": "street", "label": "Street" },
+    { "folder": "people", "label": "People" },
+    { "folder": "landscapes", "label": "Landscapes" },
+    { "folder": "business", "label": "Business" }
+  ],
+
+  "videos": []
+}

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en" data-nav="{{nav_style}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}}</title>
+<meta name="description" content="{{description}}">
+<meta name="theme-color" content="#292a29">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{title}}">
+<meta property="og:description" content="{{description}}">
+{{og_tags}}
+{{canonical}}
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preload" href="fonts/texgyreadventor-bold.otf" as="font" type="font/otf" crossorigin>
+<link rel="preload" href="fonts/texgyreadventor-regular.otf" as="font" type="font/otf" crossorigin>
+<link rel="stylesheet" href="styles.css?v={{version}}">
+</head>
+<body>
+<a class="skip-link" href="#work">Skip to photos</a>
+
+<div class="page" id="page">
+  <div class="catbar" id="catbar" inert>
+    <a class="catbar-mark" href="#top" aria-label="Back to top">{{mark_svg}}</a>
+    <nav class="catbar-links" aria-label="Jump to a category" data-nav-list></nav>
+    <a class="nav-cta" href="contact/"{{contact_link_hidden}}>Contact</a>
+  </div>
+
+  <header class="site-header" id="top">
+    <a class="mark" href="#top" aria-label="{{name}}, back to top">{{mark_svg}}</a>
+    <nav class="site-nav" aria-label="Main">
+      <a class="cat" href="#work"><span class="sl" aria-hidden="true">/</span>work</a>
+      <a class="cat" href="#about"><span class="sl" aria-hidden="true">/</span>about</a>
+      <a class="nav-cta" href="contact/"{{contact_link_hidden}}>Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="site-title">
+      <h1 class="wordmark" id="site-title">{{logo_svg}}</h1>
+      <p class="tagline">{{tagline}}</p>
+      <nav class="paths" id="nav-paths" aria-label="Photo categories" data-nav-list></nav>
+    </section>
+
+    <section class="work" id="work" aria-label="Work">
+      <nav class="covers" id="nav-covers" aria-label="Photo categories"></nav>
+      <div class="work-body" id="work-body">
+        <nav class="side" id="nav-side" aria-label="Photo categories" data-nav-list></nav>
+        <div class="gallery" id="gallery"></div>
+      </div>
+      <noscript><p class="gallery-note">Turn on JavaScript to see the photos.</p></noscript>
+    </section>
+
+    <section class="about" id="about" aria-labelledby="about-title">
+      <h2 id="about-title"><span class="sl" aria-hidden="true">/</span>about</h2>
+      <div class="about-body">
+        {{about_html}}
+        {{services_html}}
+      </div>
+    </section>
+
+    <section class="contact" id="contact" aria-labelledby="contact-title"{{contact_hidden}}>
+      <h2 id="contact-title"><span class="sl" aria-hidden="true">/</span>contact</h2>
+      <div class="contact-body">
+        {{contact_html}}
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© {{year}} {{name}}. All photos by Sam.</p>
+  </footer>
+</div>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
+  <div class="lb-bar">
+    <p class="lb-count" aria-live="polite"></p>
+    <button class="lb-close" type="button" aria-label="Close viewer">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+    </button>
+  </div>
+  <figure class="lb-stage">
+    <img class="lb-img" alt="">
+  </figure>
+  <button class="lb-nav lb-prev" type="button" aria-label="Previous photo">
+    <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M15 4l-8 8 8 8"/></svg>
+  </button>
+  <button class="lb-nav lb-next" type="button" aria-label="Next photo">
+    <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M9 4l8 8-8 8"/></svg>
+  </button>
+  <div class="lb-info">
+    <p class="lb-title"></p>
+    <p class="lb-settings"></p>
+  </div>
+</div>
+
+<script id="site-data" type="application/json">{{data_json}}</script>
+<script src="app.js?v={{version}}" defer></script>
+</body>
+</html>

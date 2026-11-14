@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact | {{title}}</title>
+<meta name="description" content="Book a shoot or ask a question. {{tagline}}">
+<meta name="theme-color" content="#292a29">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Contact | {{title}}">
+<meta property="og:description" content="Book a shoot or ask a question.">
+{{og_tags}}
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="preload" href="../fonts/texgyreadventor-bold.otf" as="font" type="font/otf" crossorigin>
+<link rel="preload" href="../fonts/texgyreadventor-regular.otf" as="font" type="font/otf" crossorigin>
+<link rel="stylesheet" href="../styles.css?v={{version}}">
+</head>
+<body>
+<a class="skip-link" href="#inquiry">Skip to the form</a>
+
+<div class="page" id="page">
+  <header class="site-header" id="top">
+    <a class="mark" href="../" aria-label="{{name}}, home">{{mark_svg}}</a>
+    <nav class="site-nav" aria-label="Main">
+      <a class="cat" href="../#work"><span class="sl" aria-hidden="true">/</span>work</a>
+      <a class="cat" href="../#about"><span class="sl" aria-hidden="true">/</span>about</a>
+      <a class="nav-cta" href="./" aria-current="page">Contact</a>
+    </nav>
+  </header>
+
+  <main class="cp">
+    <section class="cp-intro" aria-labelledby="cp-title">
+      <h1 id="cp-title"><span class="sl" aria-hidden="true">/</span>contact</h1>
+      <p class="cp-lede">Tell me about your shoot, or ask anything. I reply {{reply_time}}.</p>
+      {{booking_note_html}}
+    </section>
+
+    <div class="cp-grid">
+      <form class="cp-form" id="inquiry" novalidate
+            data-key="{{web3forms_key}}" data-email="{{email}}" data-reply="{{reply_time}}" data-site="{{name}}">
+        <div class="cp-fields">
+          <div class="cp-field">
+            <label for="f-name">Your name</label>
+            <input class="cp-input" id="f-name" name="name" type="text" autocomplete="name" required>
+            <p class="cp-error" id="f-name-error" hidden>Add your name so I know who I'm writing back to.</p>
+          </div>
+          <div class="cp-field">
+            <label for="f-email">Email</label>
+            <input class="cp-input" id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required>
+            <p class="cp-error" id="f-email-error" hidden>Enter an email I can reply to, like name@example.com.</p>
+          </div>
+        </div>
+
+        <fieldset class="cp-types" aria-describedby="f-type-error">
+          <legend>What do you need?</legend>
+          <div class="cp-chips has-ray" id="cp-chips">
+            {{shoot_types_html}}
+            <span class="cat-ray" aria-hidden="true">/</span>
+          </div>
+          <p class="cp-error" id="f-type-error" hidden>Pick the one closest to your shoot.</p>
+        </fieldset>
+
+        <div class="cp-field">
+          <label for="f-message">Your message</label>
+          <textarea class="cp-input" id="f-message" name="message" rows="5" required
+                    placeholder="What are you planning? Questions are welcome too."></textarea>
+          <p class="cp-error" id="f-message-error" hidden>Write a line or two about what you need.</p>
+        </div>
+
+        <details class="cp-more">
+          <summary>Add details <span>(optional)</span></summary>
+          <div class="cp-fields cp-more-fields">
+            <div class="cp-field">
+              <label for="f-date">Shoot date or deadline</label>
+              <input class="cp-input" id="f-date" name="date" type="text" placeholder="e.g. Dec 12, or flexible">
+            </div>
+            <div class="cp-field">
+              <label for="f-location">Location</label>
+              <input class="cp-input" id="f-location" name="location" type="text" autocomplete="address-level2" placeholder="City or address">
+            </div>
+            <div class="cp-field">
+              <label for="f-budget">Budget</label>
+              <select class="cp-input" id="f-budget" name="budget">
+                {{budgets_html}}
+              </select>
+            </div>
+            <div class="cp-field">
+              <label for="f-phone">Phone</label>
+              <input class="cp-input" id="f-phone" name="phone" type="tel" autocomplete="tel">
+            </div>
+            <div class="cp-field cp-wide">
+              <label for="f-found">How did you find me?</label>
+              <input class="cp-input" id="f-found" name="found" type="text" placeholder="Instagram, a friend, Google...">
+            </div>
+          </div>
+        </details>
+
+        <input class="cp-botcheck" type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+        <div class="cp-actions">
+          <button class="nav-cta cp-send" type="submit">Send message</button>
+          <p class="cp-privacy">Your details are only used to reply to you.</p>
+        </div>
+        <p class="cp-status" id="cp-status" role="status" aria-live="polite"></p>
+      </form>
+
+      <aside class="cp-direct" aria-label="Other ways to reach me">
+        {{direct_html}}
+      </aside>
+    </div>
+
+    <section class="cp-faq" aria-labelledby="faq-title"{{faq_hidden}}>
+      <h2 id="faq-title"><span class="sl" aria-hidden="true">/</span>questions</h2>
+      <div class="cp-faq-list">
+        {{faq_html}}
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© {{year}} {{name}}. All photos by Sam.</p>
+  </footer>
+</div>
+
+<script src="../contact.js?v={{version}}" defer></script>
+</body>
+</html>

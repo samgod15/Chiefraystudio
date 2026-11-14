@@ -1,0 +1,2 @@
+Put your street photos in this folder (JPG, PNG or WebP).
+This text file is ignored by the site.
