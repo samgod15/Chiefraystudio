@@ -227,6 +227,26 @@ img, svg { display: block; }
 .shutter-blink { position: fixed; inset: 0; z-index: 55; background: #0d0d0c; opacity: 0; pointer-events: none; }
 :root.intro-wait .wordmark .logo { visibility: hidden; animation: show-late 0s 2.5s forwards; }
 @keyframes show-late { to { visibility: visible; } }
+/* Autofocus: a blurred copy of the letters that fades in and out over the logo. */
+.wordmark .logo-soft { position: absolute; left: 0; top: 0; opacity: 0; pointer-events: none; transform-origin: 50% 50%; }
+
+/* Fade on scroll. Tied to the scroll itself where the browser can (Safari 26+,
+   Chrome), so it moves exactly with your finger; elsewhere a short fade when
+   something crosses the edge of the screen (motion.js picks which). */
+@media (prefers-reduced-motion: no-preference) {
+  :root.fx-scroll :is(.hero .wordmark, .hero .tagline, .hero .paths, #gallery .tile:not(.is-entering),
+    #gallery .video:not(.is-entering), #gallery .roll-card:not(.is-entering), .roll-head > *,
+    .about h2, .about-body > *, .contact h2, .contact-body > *, .site-footer) {
+    animation: fx-in linear both, fx-out linear both;
+    animation-timeline: view(), view();
+    animation-range: entry 0% entry 100%, exit 0% exit 100%;
+  }
+  :root.fx-io .fx-t { transition: opacity 0.6s ease-out, transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  :root.fx-io .fx-below { opacity: 0; transform: translateY(34px); }
+  :root.fx-io .fx-above { opacity: 0; transform: translateY(-22px); }
+}
+@keyframes fx-in { from { opacity: 0; transform: translateY(34px); } }
+@keyframes fx-out { to { opacity: 0; transform: translateY(-22px); } }
 @keyframes fade-in { from { opacity: 0; } }
 @keyframes draw-ray { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 

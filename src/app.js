@@ -260,6 +260,9 @@
     const startY = scrollY;
     const distance = targetY - startY;
     if (reduceMotion.matches || Math.abs(distance) < 2) { window.scrollTo(0, targetY); return; }
+    // On phones the browser's own smooth scroll runs alongside the touch scrolling
+    // and stays smoother than stepping the page from a script.
+    if (window.matchMedia('(pointer: coarse)').matches) { window.scrollTo({ top: targetY, behavior: 'smooth' }); return; }
     const duration = Math.min(1200, Math.max(650, Math.abs(distance) * 0.6));
     const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
     const stop = () => { scrollRun++; };
