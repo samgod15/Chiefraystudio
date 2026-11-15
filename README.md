@@ -84,6 +84,31 @@ What you can change in `site.json`:
 Spam: a hidden field that only bots fill in blocks most junk. If spam still
 gets through, Web3Forms can add a captcha.
 
+## Rolls: shoots with a story
+
+A roll is one shoot with its own page: a big title, where and when, who it was for,
+the camera you used, and a few lines in your own words, then the photos. They're
+listed under **/rolls** next to the categories (it appears once you have one).
+
+1. In `photos/rolls`, create a folder for the shoot, starting with a number:
+   `03-brunch-at-the-corner-cafe`. On GitHub: **Add file → Create new file** and type
+   `03-brunch-at-the-corner-cafe/story.txt` as the name (the `/` makes the folder).
+2. Fill in `story.txt` (copy the example from `photos/rolls/story-template.txt`):
+   ```
+   title: Brunch at the Corner Cafe
+   place: Port Coquitlam
+   date: November 2026
+   client: Corner Cafe
+   category: business
+   cover: 02-eggs-benny.jpg
+
+   A few lines about the shoot, in your own words.
+   ```
+3. Upload the shoot's photos into that folder.
+
+The newest roll (highest number) shows first. With `category:` set, the roll's photos
+also appear in that category, and anyone opening one of them sees a link to the roll.
+
 ## Adding photos
 
 **Export first.** Don't upload straight off the camera. In your editor's export settings:

@@ -1,0 +1,29 @@
+HOW TO ADD A ROLL (one shoot with its own page and story)
+
+1. Make a folder here for the shoot. Start its name with a number so the rolls
+   stay in order, e.g.  03-brunch-at-the-corner-cafe
+   (On GitHub: Add file > Create new file, and type  03-brunch-at-the-corner-cafe/story.txt
+   as the name. The "/" creates the folder.)
+2. Put a file called story.txt in that folder, like the example below.
+3. Upload the shoot's photos into the same folder (exported the usual way).
+
+The newest roll (highest number) shows first. The roll's photos also show up in the
+category you name, so you only upload them once.
+
+---------- copy from here into story.txt ----------
+title: Brunch at the Corner Cafe
+place: Port Coquitlam
+date: November 2026
+client: Corner Cafe
+category: business
+cover: 02-eggs-benny.jpg
+
+A few lines in your own words: who it was for, what they needed, how the day went,
+what you were going for.
+
+Leave an empty line between paragraphs.
+---------- to here ----------
+
+Every line at the top is optional except title. "category" is one of your categories
+(street, people, landscapes, business, b&w, film). "cover" is the file name of the
+photo to use on the roll's card; without it the first photo is used.

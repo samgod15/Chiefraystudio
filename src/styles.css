@@ -887,6 +887,56 @@ select.cp-input option { background: var(--wall-deep); color: var(--ink); }
   .cp details::details-content { transition: none; }
 }
 
+/* ---------------------------------------------------------------- rolls */
+
+/* "/rolls": one card per shoot. The number is printed like the edge of a roll of film. */
+.rolls {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+  gap: clamp(26px, 3vw, 40px) clamp(14px, 2vw, 24px);
+  align-items: start;
+}
+.roll-card { display: grid; gap: 3px; color: var(--ink); text-decoration: none; }
+.roll-cover { position: relative; display: block; aspect-ratio: 4 / 5; margin-bottom: 9px; overflow: hidden; }
+.roll-cover img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.roll-card:hover .roll-cover img { transform: scale(1.04); }
+.roll-count {
+  position: absolute; left: 10px; bottom: 10px;
+  padding: 4px 10px; border-radius: 999px;
+  background: rgba(13, 13, 12, 0.62); color: #edebe6;
+  font-family: var(--brand); font-size: 13px; line-height: 1.3;
+}
+.roll-no { color: var(--ink-soft); font-family: var(--brand); font-size: 14px; letter-spacing: 0.02em; }
+.roll-no .sl { margin-right: 1px; color: var(--accent); font-weight: 700; }
+.roll-name { font-family: var(--brand); font-weight: 700; font-size: clamp(20px, 1.8vw, 24px); line-height: 1.2; letter-spacing: -0.01em; }
+.roll-where { color: var(--ink-soft); font-size: 15px; line-height: 1.4; }
+.roll-card:focus-visible { outline: 2px solid var(--ray); outline-offset: 4px; }
+@media (max-width: 560px) {
+  .rolls { grid-template-columns: 1fr 1fr; gap: 24px 10px; }
+  .roll-name { font-size: 18px; }
+  .roll-where { font-size: 14px; }
+}
+
+/* A roll's own page: the story sits above its photos. */
+.roll-head { display: grid; gap: 10px; max-width: 760px; margin: 0 0 clamp(28px, 4vw, 48px); }
+.roll-head[hidden] { display: none; }
+.roll-back { justify-self: start; padding: 6px 0; font-size: 17px; }
+.roll-head .roll-no { margin-top: 6px; }
+.roll-title { margin: 0; font-family: var(--brand); font-weight: 700; font-size: clamp(36px, 5.4vw, 68px); line-height: 1.04; letter-spacing: -0.025em; }
+.roll-meta { display: flex; flex-wrap: wrap; gap: 10px clamp(18px, 2.4vw, 34px); margin: 8px 0 4px; font-family: var(--brand); }
+.roll-story p { max-width: 62ch; margin: 0 0 0.9em; font-size: clamp(18px, 1.45vw, 21px); line-height: 1.62; }
+.roll-story p:last-child { margin-bottom: 0; }
+:root[data-nav="index"] .roll-head { grid-column: 2; }
+:root[data-nav="index"] .side { grid-row: 1 / span 2; }
+
+/* In the viewer: the shoot this photo came from. */
+.lb-roll { display: grid; gap: 1px; color: var(--ink); text-decoration: none; font-family: var(--brand); }
+.lb-roll[hidden] { display: none; }
+.lb-roll-label { color: var(--ink-soft); font-size: 13px; line-height: 1.2; }
+.lb-roll-label .sl { margin-right: 1px; color: var(--accent); font-weight: 700; }
+.lb-roll-name { font-weight: 700; font-size: clamp(17px, 1.6vw, 21px); line-height: 1.25; text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.lb-roll:hover .lb-roll-name { color: var(--accent); }
+
 /* ---------------------------------------------------------------- lightbox */
 
 .lightbox {

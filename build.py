@@ -257,6 +257,59 @@ def youtube_id(value):
 
 # ---------------------------------------------------------------- build
 
+def add_files(folder, entry, jobs):
+    files = sorted((p for p in folder.iterdir() if p.is_file()), key=lambda p: natural_key(p.name))
+    for path in files:
+        ext = path.suffix.lower()
+        if ext in UNSUPPORTED_EXTS:
+            warn(f"{ext} files can't be shown on the web. Export a JPG instead.", path)
+            continue
+        if ext not in PHOTO_EXTS:
+            continue
+        size_mb = path.stat().st_size / 1e6
+        if size_mb > LARGE_FILE_MB:
+            warn(f"{size_mb:.0f} MB is large for the repo. Export at 2560 px "
+                 "on the long edge to save space.", path)
+        digest = file_digest(path)
+        entry["files"].append((path, digest))
+        jobs.append((path, digest))
+
+
+STORY_KEYS = {"title": "title", "place": "place", "where": "place", "location": "place",
+              "date": "date", "when": "date", "client": "client", "business": "client",
+              "category": "category", "cover": "cover"}
+
+
+def read_story(folder):
+    """story.txt: 'key: value' lines (title, place, date, client, category, cover),
+    then the story itself. Blank lines separate paragraphs."""
+    story = {"paragraphs": []}
+    path = folder / "story.txt"
+    if not path.exists():
+        warn("no story.txt in this roll, so it shows without a story", folder)
+        return story
+    lines = path.read_text(encoding="utf-8", errors="replace").replace("\r\n", "\n").split("\n")
+    i = 0
+    while i < len(lines):
+        line = lines[i].strip()
+        m = re.match(r"^([A-Za-z]+)\s*:\s*(.*)$", line)
+        if m and m.group(1).lower() in STORY_KEYS:
+            story[STORY_KEYS[m.group(1).lower()]] = m.group(2).strip()
+            i += 1
+        elif not line:
+            i += 1
+        else:
+            break
+    paragraph = []
+    for line in lines[i:] + [""]:
+        if line.strip():
+            paragraph.append(line.strip())
+        elif paragraph:
+            story["paragraphs"].append(" ".join(paragraph))
+            paragraph = []
+    return story
+
+
 def collect(config):
     categories, jobs = [], []
     for cat in config["categories"]:
@@ -264,25 +317,24 @@ def collect(config):
         entry = {"id": slugify(cat["folder"]), "label": cat.get("label") or cat["folder"].title(),
                  "cover": str(cat.get("cover") or "").strip(), "files": []}
         if folder.is_dir():
-            files = sorted((p for p in folder.iterdir() if p.is_file()),
-                           key=lambda p: natural_key(p.name))
-            for path in files:
-                ext = path.suffix.lower()
-                if ext in UNSUPPORTED_EXTS:
-                    warn(f"{ext} files can't be shown on the web. Export a JPG instead.", path)
-                    continue
-                if ext not in PHOTO_EXTS:
-                    continue
-                size_mb = path.stat().st_size / 1e6
-                if size_mb > LARGE_FILE_MB:
-                    warn(f"{size_mb:.0f} MB is large for the repo. Export at 2560 px "
-                         "on the long edge to save space.", path)
-                digest = file_digest(path)
-                entry["files"].append((path, digest))
-                jobs.append((path, digest))
+            add_files(folder, entry, jobs)
         else:
             warn(f"folder photos/{cat['folder']} doesn't exist, so that category is empty")
         categories.append(entry)
+    # Rolls: one folder per shoot under photos/rolls, each with its own story.
+    rolls_dir = PHOTOS / "rolls"
+    if rolls_dir.is_dir():
+        folders = sorted((d for d in rolls_dir.iterdir() if d.is_dir() and not d.name.startswith(".")),
+                         key=lambda p: natural_key(p.name))
+        for folder in folders:
+            story = read_story(folder)
+            slug = slugify(strip_order_prefix(folder.name)) or "roll"
+            name = re.sub(r"[_-]+", " ", strip_order_prefix(folder.name)).strip()
+            story.setdefault("title", name[:1].upper() + name[1:])
+            entry = {"id": "roll-" + slug, "label": story["title"], "cover": story.get("cover", ""),
+                     "files": [], "roll": story, "folder": folder}
+            add_files(folder, entry, jobs)
+            categories.append(entry)
     return categories, jobs
 
 
@@ -352,6 +404,8 @@ def build():
             if cat["cover"] and path.name == cat["cover"]:
                 cover = photo
         entry = {"id": cat["id"], "label": cat["label"], "photos": photos}
+        if "roll" in cat:
+            entry["roll"], entry["folder"] = cat["roll"], cat["folder"]
         if photos:
             # The cover card uses the photo named in site.json, else the first one.
             chosen = cover if cover else photos[0]
@@ -359,6 +413,40 @@ def build():
                 warn(f"cover '{cat['cover']}' wasn't found in photos/{cat['id']}, using the first photo")
             entry["cover"], entry["coverColor"] = chosen["g"], chosen["c"]
         data_categories.append(entry)
+
+    # Rolls: each shoot keeps its own page; its photos also join the category it names.
+    rolls = [c for c in data_categories if "roll" in c]
+    data_categories = [c for c in data_categories if "roll" not in c]
+    data_rolls = []
+    for number, roll in enumerate(rolls, start=1):
+        story, where = roll["roll"], roll["folder"]
+        if not roll["photos"]:
+            warn("this roll has no photos yet, so it's hidden", where)
+            continue
+        wanted = story.get("category", "").strip()
+        if wanted:
+            target = next((c for c in data_categories
+                           if c["id"] == slugify(wanted) or c["label"].lower() == wanted.lower()), None)
+            if target is None:
+                warn(f"category '{wanted}' in story.txt doesn't match a category in site.json", where)
+            else:
+                for photo in roll["photos"]:
+                    photo["r"] = roll["id"]
+                    target["photos"].append(photo)
+                if "cover" not in target:
+                    target["cover"], target["coverColor"] = roll["cover"], roll["coverColor"]
+        shot = []
+        for photo in roll["photos"]:
+            camera = next((v for k, v in photo.get("x", []) if k == "camera"), None)
+            if camera and camera not in shot:
+                shot.append(camera)
+        data_rolls.append({
+            "id": roll["id"], "n": number, "title": story["title"],
+            "place": story.get("place", ""), "date": story.get("date", ""),
+            "client": story.get("client", ""), "story": story["paragraphs"], "shot": shot,
+            "cover": roll["cover"], "coverColor": roll["coverColor"], "photos": roll["photos"],
+        })
+    data_rolls.reverse()   # newest roll (highest number) first
 
     # Remove cache entries for photos that no longer exist.
     for item in CACHE.iterdir():
@@ -468,6 +556,7 @@ def build():
 
     payload = {
         "categories": data_categories,
+        "rolls": data_rolls,
         "videos": videos,
     }
     data_json = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
@@ -549,6 +638,7 @@ def build():
 
     counts = ", ".join(f"{c['label']} {len(c['photos'])}" for c in data_categories)
     print(f"Built dist/ with {sum(len(c['photos']) for c in data_categories)} photo(s): {counts}"
+          + (f", {len(data_rolls)} roll(s)" if data_rolls else "")
           + (f", {len(videos)} video(s)" if videos else ""))
     if not any(c["photos"] for c in data_categories):
         warn("no photos found yet. Add some to the photos/ folders.")

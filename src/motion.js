@@ -158,7 +158,8 @@
   // Things ease in as they come up from the bottom of the screen and ease out as they
   // leave at the top (under the bar), both ways. Only opacity and a small lift, so
   // nothing changes size or position for the layout.
-  const SEL = '.hero .wordmark, .hero .tagline, .hero .paths, #gallery .tile, #gallery .video, ' +
+  const SEL = '.hero .wordmark, .hero .tagline, .hero .paths, #gallery .tile, #gallery .video, #gallery .roll-card, ' +
+    '.roll-head > *, ' +
     '.about h2, .about-body > *, .contact h2, .contact-body > *, .site-footer';
   const tracked = new Set();
   const collect = () => {
