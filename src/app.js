@@ -176,7 +176,8 @@
       renderStoryHead(view);
       renderStoryCards(view, animate ? direction : 0);
       if (view.videos) renderVideos(view, animate ? direction : 0);
-      else renderPhotos(view, animate ? direction : 0);
+      // A one-photo story already shows that photo at the top, so nothing repeats below.
+      else renderPhotos(view.isStory && view.photos.length < 2 ? { ...view, photos: [] } : view, animate ? direction : 0);
     };
     if (animate && !reduceMotion.matches && gallery.children.length) leaveGallery(direction).then(render);
     else render();
@@ -361,7 +362,7 @@
     // Row height to aim for. On phones 240 puts two upright photos side by side.
     const target = width < 520 ? 240 : width < 900 ? 290 : width < 1500 ? 380 : 440;
     const tiles = gallery.children;
-    const photos = current.photos;
+    const photos = current.photos.slice(0, tiles.length);   // a one-photo story shows no tiles
     let top = 0;
     let row = [];
     let aspectSum = 0;
@@ -454,8 +455,13 @@
 
     const hero = el('button', 'story-hero');
     hero.type = 'button';
-    hero.setAttribute('aria-label', 'Open the first photo');
-    hero.style.backgroundColor = view.coverColor || '';
+    hero.setAttribute('aria-label', view.photos.length > 1 ? 'Open the photos' : 'Open the photo');
+    // A tall or square lead photo is shown whole instead of cut down to a wide strip.
+    const lead = view.photos.find((p) => p.f === view.hero) || view.photos[0];
+    if (lead && lead.w / lead.h < 1.2) {
+      hero.classList.add('is-tall');
+      hero.style.aspectRatio = lead.w + ' / ' + lead.h;
+    } else hero.style.backgroundColor = view.coverColor || '';
     const heroImg = el('img');
     heroImg.alt = '';
     heroImg.decoding = 'async';
@@ -538,7 +544,7 @@
       img.loading = 'lazy';
       img.decoding = 'async';
       img.src = st.cover;
-      frame.append(img, el('span', 'story-count', st.photos.length + ' photos'));
+      frame.append(img, el('span', 'story-count', st.photos.length + (st.photos.length === 1 ? ' photo' : ' photos')));
       const where = [st.place, st.date].filter(Boolean).join(', ');
       card.append(frame, slashed('story-kicker', st.client || 'story'), el('span', 'story-name', st.title),
         ...(where ? [el('span', 'story-where', where)] : []), el('span', 'story-open', 'Read the story'));

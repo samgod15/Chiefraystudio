@@ -962,6 +962,8 @@ select.cp-input option { background: var(--wall-deep); color: var(--ink); }
   overflow: hidden; cursor: zoom-in; background: var(--wall-deep);
 }
 .story-hero img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.story-hero.is-tall { width: calc(100% + 2 * var(--gutter)); height: auto; max-height: 80vh; }
+.story-hero.is-tall img { object-fit: contain; }
 .story-hero:focus-visible { outline: 2px solid var(--ray); outline-offset: -4px; }
 .story-link { color: inherit; text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 4px; }
 .story-link:hover { color: var(--accent); }
