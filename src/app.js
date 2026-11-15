@@ -477,10 +477,26 @@
     const photo = list[viewer.index];
     vCount.textContent = list.length > 1 ? (viewer.index + 1) + ' of ' + list.length : '';
     vTitle.textContent = photo.t || '';
-    vSettings.replaceChildren(...(photo.x || []).map((text) => {
-      const span = document.createElement('span');
-      span.textContent = text;
-      return span;
+    vSettings.replaceChildren(...(photo.x || []).map((item) => {
+      const [label, value] = Array.isArray(item) ? item : ['', item];
+      const row = document.createElement('div');
+      row.className = 'lb-set';
+      const dt = document.createElement('dt');
+      dt.textContent = label;
+      const dd = document.createElement('dd');
+      // "f/2.8" gets the logo's orange slash.
+      const parts = String(value).split(/(f\/)/);
+      for (const part of parts) {
+        if (part === 'f/') {
+          const sl = document.createElement('span');
+          sl.className = 'sl';
+          sl.textContent = '/';
+          dd.append('f', sl);
+        } else if (part) dd.append(part);
+      }
+      if (label) row.append(dt);
+      row.append(dd);
+      return row;
     }));
     vImg.alt = photo.alt;
     vImg.style.backgroundColor = photo.c;

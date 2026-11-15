@@ -45,7 +45,7 @@ GRID_BOX = (2400, 720)   # gallery thumbnails: fit inside this box
 FULL_EDGE = 2400         # full-screen viewer: longest edge
 GRID_QUALITY = 78
 FULL_QUALITY = 84
-SETTINGS_KEY = f"v3-{GRID_BOX}-{FULL_EDGE}-{GRID_QUALITY}-{FULL_QUALITY}"
+SETTINGS_KEY = f"v4-{GRID_BOX}-{FULL_EDGE}-{GRID_QUALITY}-{FULL_QUALITY}"
 
 PHOTO_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff"}
 UNSUPPORTED_EXTS = {".arw", ".cr2", ".cr3", ".nef", ".dng", ".raf", ".orf",
@@ -132,28 +132,50 @@ def camera_settings(img):
     if isinstance(iso, (tuple, list)):
         iso = iso[0] if iso else None
 
+    # Each detail is (label, value); the viewer shows the label small and the value big.
     parts = []
     if model:
         if model in CAMERA_NAMES:
-            parts.append(CAMERA_NAMES[model])
+            camera = CAMERA_NAMES[model]
         elif model.startswith(("ILCE-", "ILME-")) and make.upper() == "SONY":
-            parts.append("Sony " + model.split("-", 1)[1])
+            camera = "Sony " + model.split("-", 1)[1]
         elif make and not model.lower().startswith(make.lower().split()[0]):
-            parts.append(f"{make.title()} {model}")
+            camera = f"{make.title()} {model}"
         else:
-            parts.append(model)
+            camera = model
+        parts.append(("camera", camera))
+    lens = lens_name(sub.get(0xA434))
+    if lens:
+        parts.append(("lens", lens))
     if focal:
-        parts.append(f"{round(focal)} mm")
+        parts.append(("focal length", f"{round(focal)} mm"))
     if fnum:
-        parts.append(f"f/{round(fnum, 1):g}")
+        parts.append(("aperture", f"f/{round(fnum, 1):g}"))
     if shutter:
         if shutter >= 0.3:
-            parts.append(f"{round(shutter, 1):g} s")
+            parts.append(("shutter", f"{round(shutter, 1):g} s"))
         else:
-            parts.append(f"1/{round(1 / shutter)} s")
+            parts.append(("shutter", f"1/{round(1 / shutter)} s"))
     if iso:
-        parts.append(f"ISO {iso}")
+        parts.append(("ISO", str(iso)))
     return parts, has_gps
+
+
+def lens_name(raw):
+    """'E 17-70mm F2.8 B070' -> '17–70mm f/2.8'. Falls back to the raw name."""
+    name = str(raw or "").strip().strip("\x00").strip()
+    if not name:
+        return None
+    m = re.search(r"(\d+(?:\.\d+)?)(?:\s*-\s*(\d+(?:\.\d+)?))?\s*mm", name, re.I)
+    if not m:
+        return name[:40]
+    lo, hi = m.group(1), m.group(2)
+    text = lo + (f"\u2013{hi}" if hi and hi != lo else "") + "mm"
+    a = re.search(r"F\s?/?\s?(\d+(?:\.\d+)?)(?:\s*-\s*(\d+(?:\.\d+)?))?", name[m.end():], re.I)
+    if a:
+        flo, fhi = a.group(1), a.group(2)
+        text += f" f/{flo}" + (f"\u2013{fhi}" if fhi and fhi != flo else "")
+    return text
 
 
 def to_srgb(img):

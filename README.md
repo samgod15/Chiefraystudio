@@ -52,7 +52,7 @@ Click `site.json` on GitHub, then the pencil icon, edit, and commit. The site re
 | `share_photo` | Which photo shows in link previews, e.g. `"street/03-gastown.jpg"`. Defaults to your first photo. |
 | `motion` | `true` for the logo intro, the autofocus animation and the fade on scroll. `false` for a still site. |
 | `nav_style` | How categories are shown: `"path"` (big /street /people words under the logo), `"covers"` (a photo card per category) or `"index"` (a list beside the gallery). |
-| `show_camera_settings` | Shows camera, focal length, aperture, shutter and ISO in the viewer. `false` to hide. |
+| `show_camera_settings` | Shows camera, lens, focal length, aperture, shutter and ISO under each photo in the viewer (read from the photo's metadata, so keep camera info when you export). `false` to hide. |
 | `categories` | Rename a tab with `label`, or add a category: add a line here and create the matching folder under `photos/`. Add `"cover": "03-gastown.jpg"` to pick the photo on that category's cover card (otherwise the first photo is used). |
 | `videos` | YouTube links, e.g. `{ "url": "https://youtu.be/XXXX", "title": "Promo reel" }`. Adds a Video tab. Shorts links show as vertical. |
 
@@ -175,7 +175,7 @@ and open http://localhost:8000. Not required, since GitHub builds the site for y
   the round sun/moon button in the header switches it (remembered on that device).
   Dark mode is charcoal; light mode is soft blush with category highlighters in shades
   of the Safelight colour. Both sets of colours are at the top of `src/styles.css`.
-  The photo viewer stays dark in both, since photos are judged on grey.
+  The photo viewer follows the same mode and has the same switch in its top bar.
 - `src/favicon.svg` is the browser tab icon; `src/apple-touch-icon.png` is the icon
   an iPhone uses when someone saves your site to their home screen.
 - The full logo pack (PNGs, black and white versions, Instagram avatar,
