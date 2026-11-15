@@ -49,7 +49,8 @@ Click `site.json` on GitHub, then the pencil icon, edit, and commit. The site re
 | `about` | Your bio. One quoted string per paragraph. The text in there is a draft, so rewrite it in your own words. |
 | `services` | The "What I shoot" list. |
 | `site_url` | Your domain, `"https://chiefraystudio.com"`. Makes link previews on Instagram and iMessage show your photo. |
-| `share_photo` | Which photo shows in link previews, e.g. `"street/03-gastown.jpg"`. Defaults to your first photo. |
+| `share_image` | The picture shown when someone shares your link (iMessage, Instagram, WhatsApp): `"logo"` (your logo on charcoal), `"photo+logo"` (a photo with your logo over it) or `"photo"`. |
+| `share_photo` | Which photo the `photo` options use, e.g. `"landscapes/DSC00740.jpg"`. Defaults to your first photo. |
 | `motion` | `true` for the logo intro, the autofocus animation and the fade on scroll. `false` for a still site. |
 | `nav_style` | How categories are shown: `"path"` (big /street /people words under the logo), `"covers"` (a photo card per category) or `"index"` (a list beside the gallery). |
 | `show_camera_settings` | Shows camera, lens, focal length, aperture, shutter and ISO under each photo in the viewer (read from the photo's metadata, so keep camera info when you export). `false` to hide. |

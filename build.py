@@ -21,7 +21,7 @@ from concurrent.futures import ProcessPoolExecutor
 from datetime import date
 from pathlib import Path
 
-from PIL import ExifTags, Image, ImageCms, ImageFilter, ImageOps
+from PIL import ImageDraw, ExifTags, Image, ImageCms, ImageFilter, ImageOps
 
 ROOT = Path(__file__).resolve().parent
 SRC = ROOT / "src"
@@ -346,6 +346,44 @@ def esc(text):
     return html.escape(str(text), quote=True)
 
 
+def share_card(mode, photo_path):
+    """1200 x 630 link-preview picture."""
+    W, H = 1200, 630
+    logo = Image.open(SRC / "share-logo.png").convert("RGBA")
+    if mode == "logo" or photo_path is None:
+        card = Image.new("RGB", (W, H), (41, 42, 41))
+        lw = 820
+        mark = logo.resize((lw, round(lw * logo.height / logo.width)), Image.Resampling.LANCZOS)
+        x, y = (W - lw) // 2, (H - mark.height) // 2 + 12
+        # The optical axis through the logo, as on the site: dash, gap, dot, gap.
+        draw = ImageDraw.Draw(card)
+        ay = y + round(0.3846 * mark.height)
+        pos = 0
+        while pos < W:
+            for length, on in ((27, True), (9, False), (3, True), (9, False)):
+                if on:
+                    draw.line([(pos, ay), (min(W, pos + length), ay)], fill=(99, 98, 94), width=2)
+                pos += length
+        card.paste(mark, (x, y), mark)
+        return card
+    with Image.open(photo_path) as opened:
+        img = to_srgb(ImageOps.exif_transpose(opened))
+    card = ImageOps.fit(img, (W, H), Image.Resampling.LANCZOS).convert("RGB")
+    card.info = {}
+    if mode == "photo+logo":
+        # A dark fade along the bottom so the logo reads on any photo.
+        fade = Image.new("L", (1, H))
+        for yy in range(H):
+            t = max(0.0, (yy - H * 0.35) / (H * 0.65))
+            fade.putpixel((0, yy), int(205 * t ** 1.4))
+        shade = Image.new("RGB", (W, H), (20, 20, 19))
+        card = Image.composite(shade, card, fade.resize((W, H)))
+        lw = 520
+        mark = logo.resize((lw, round(lw * logo.height / logo.width)), Image.Resampling.LANCZOS)
+        card.paste(mark, (52, H - mark.height - 28), mark)
+    return card
+
+
 def build():
     config = json.loads((ROOT / "site.json").read_text(encoding="utf-8"))
     CACHE.mkdir(exist_ok=True)
@@ -364,7 +402,7 @@ def build():
 
     if DIST.exists():
         shutil.rmtree(DIST)
-    shutil.copytree(SRC, DIST, ignore=shutil.ignore_patterns("index.html", "contact.html", ".*"))
+    shutil.copytree(SRC, DIST, ignore=shutil.ignore_patterns("index.html", "contact.html", "share-logo.png", ".*"))
 
     data_categories, all_photos, used = [], [], set()
     gps_files = []
@@ -485,17 +523,23 @@ def build():
             warn(f"share_photo '{wanted}' wasn't found, using the first photo instead")
         share = all_photos[0][0]
     site_url = str(config.get("site_url") or "").strip().rstrip("/")
-    if share:
-        with Image.open(share) as opened:
-            img = to_srgb(ImageOps.exif_transpose(opened))
-        card = ImageOps.fit(img, (1200, 630), Image.Resampling.LANCZOS)
-        card.info = {}
-        card.save(DIST / "og.jpg", "JPEG", quality=85, optimize=True, progressive=True)
+    # The picture shown when the site is shared (iMessage, Instagram, WhatsApp...).
+    # "logo": the logo on charcoal. "photo+logo": a photo with the logo over it.
+    # "photo": just the photo.
+    mode = str(config.get("share_image") or "logo").strip().lower()
+    if mode not in ("logo", "photo", "photo+logo"):
+        warn(f"share_image '{mode}' isn't one of logo, photo or photo+logo; using logo")
+        mode = "logo"
+    card = share_card(mode, share)
+    card.save(DIST / "og.jpg", "JPEG", quality=88, optimize=True, progressive=True)
+    # A fingerprint in the address makes apps fetch the new picture when it changes.
+    og_version = hashlib.sha1((DIST / "og.jpg").read_bytes()).hexdigest()[:8]
+    share = True
 
     def og_tags_for(prefix):
         if not share:
             return ""
-        og_url = f"{site_url}/og.jpg" if site_url else f"{prefix}og.jpg"
+        og_url = (f"{site_url}/og.jpg" if site_url else f"{prefix}og.jpg") + f"?v={og_version}"
         return (f'<meta property="og:image" content="{esc(og_url)}">\n'
                 '<meta property="og:image:width" content="1200">\n'
                 '<meta property="og:image:height" content="630">\n'
