@@ -29,6 +29,17 @@ PHOTOS = ROOT / "photos"
 DIST = ROOT / "dist"
 CACHE = ROOT / ".cache"
 
+# Dark / light switch in the header (theme.js shows the right icon and label).
+THEME_TOGGLE = (
+    '<button class="theme-toggle" type="button" aria-label="Switch between dark and light mode">'
+    '<svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">'
+    '<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2'
+    'M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>'
+    '<svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">'
+    '<path d="M20 14.6A8.2 8.2 0 0 1 9.4 4a8.2 8.2 0 1 0 10.6 10.6z"/></svg>'
+    '</button>'
+)
+
 # Image settings. Changing any of these re-processes every photo.
 GRID_BOX = (2400, 720)   # gallery thumbnails: fit inside this box
 FULL_EDGE = 2400         # full-screen viewer: longest edge
@@ -441,7 +452,7 @@ def build():
     data_json = data_json.replace("</", "<\\/")
 
     version = hashlib.sha1()
-    for f in ("styles.css", "app.js", "contact.js"):
+    for f in ("styles.css", "app.js", "contact.js", "theme.js"):
         version.update((SRC / f).read_bytes())
 
     page = render((SRC / "index.html").read_text(encoding="utf-8"), {
@@ -451,6 +462,7 @@ def build():
         "tagline": esc(config.get("tagline", "")),
         "logo_svg": logo_svg,
         "mark_svg": mark_svg,
+        "theme_toggle": THEME_TOGGLE,
         "about_html": about_html,
         "services_html": services_html,
         "contact_html": "\n".join(contact_parts),
@@ -495,6 +507,7 @@ def build():
             "name": esc(name),
             "tagline": esc(config.get("tagline", "")),
             "mark_svg": mark_svg,
+            "theme_toggle": THEME_TOGGLE,
             "og_tags": og_tags_for("../"),
             "reply_time": esc(form_cfg.get("reply_time") or "soon"),
             "booking_note_html": note_html,

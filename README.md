@@ -9,6 +9,8 @@ photos/street/        your street photos
 photos/people/        portraits
 photos/landscapes/    landscapes
 photos/business/      menus, listings, client work
+photos/bw/            black and white photos (any subject)
+photos/film/          film-look photos (any subject)
 site.json             your name, about text, email, Instagram, videos
 src/                  the page design (HTML, CSS, JS, fonts)
 build.py              resizes photos and assembles the site
@@ -94,6 +96,9 @@ gets through, Web3Forms can add a captcha.
 **Upload.** On GitHub, open `photos/street` (or another folder) → **Add file → Upload files**
 → drag photos in → **Commit changes**. The site updates in about a minute.
 
+- **Which folder:** colour photos go in their subject folder (street, people, landscapes,
+  business). Black and white photos go in `bw`, film-look photos in `film`, whatever the
+  subject. Each photo goes in one folder only. A category with no photos stays hidden.
 - **Order:** photos sort by filename, so prefix them: `01-…`, `02-…`. The *All* tab mixes categories together.
 - **Captions:** a descriptive filename becomes the caption. `03-gastown-in-the-rain.jpg`
   shows as "Gastown in the rain". Camera names like `DSC01234.jpg` get no caption.
@@ -155,6 +160,11 @@ and open http://localhost:8000. Not required, since GitHub builds the site for y
   Both are outlines, so they look the same everywhere with no font to load.
 - The accent colour (the slash, the active tab underline, focus rings) is `--ray`
   near the top of `src/styles.css`: Safelight `#e4522a`.
+- **Dark and light mode.** The site follows the visitor's phone or computer setting, and
+  the round sun/moon button in the header switches it (remembered on that device).
+  Dark mode is charcoal; light mode is soft blush with category highlighters in shades
+  of the Safelight colour. Both sets of colours are at the top of `src/styles.css`.
+  The photo viewer stays dark in both, since photos are judged on grey.
 - `src/favicon.svg` is the browser tab icon; `src/apple-touch-icon.png` is the icon
   an iPhone uses when someone saves your site to their home screen.
 - The full logo pack (PNGs, black and white versions, Instagram avatar,

@@ -43,7 +43,9 @@
     { "folder": "street", "label": "Street" },
     { "folder": "people", "label": "People" },
     { "folder": "landscapes", "label": "Landscapes" },
-    { "folder": "business", "label": "Business" }
+    { "folder": "business", "label": "Business" },
+    { "folder": "bw", "label": "B&W" },
+    { "folder": "film", "label": "Film" }
   ],
 
   "videos": []

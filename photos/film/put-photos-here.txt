@@ -1,0 +1,2 @@
+Put your film-look photos in this folder (JPG, PNG or WebP), whatever the subject.
+This text file is ignored by the site.

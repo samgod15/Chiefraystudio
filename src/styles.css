@@ -26,6 +26,13 @@
   /* Safelight: the darkroom glow. One accent, passes 3:1 on grey and on paper. */
   --ray: #e4522a;
   --ray-bright: #ef6b45;
+  /* The Contact button is the same Safelight pill in both modes. */
+  --cta: #e4522a;
+  --cta-hover: #ef6b45;
+  --on-ray: #1b1b1a;
+  /* Category highlighters: none in dark mode, pastel shades in light mode. */
+  --hl-1: transparent; --hl-2: transparent; --hl-3: transparent; --hl-4: transparent;
+  --hl-5: transparent; --hl-6: transparent; --hl-7: transparent;
 
   --brand: "Adventor", "Futura", "Century Gothic", "Avenir Next", sans-serif;
   --display: var(--brand);
@@ -37,6 +44,42 @@
   color-scheme: dark;
 }
 
+/* Light mode: soft blush walls with highlighters in shades of the same Safelight
+   hue, lightest to deepest. Used when the visitor picks it, or when their device is
+   set to light and they haven't picked. Keep the two blocks below identical. */
+:root[data-theme="light"] {
+  --wall: #f7ece8;
+  --wall-deep: #efdcd6;
+  --ink: #2b2726;
+  --ink-soft: #64544f;
+  --rule: #e2cac3;
+  --ink-faint: #6f5c57;
+  --error: #b3261e;
+  --axis: #d3b2a8;
+  --ray: #d9481f;
+  --ray-bright: #e4522a;
+  --hl-1: #f9d7cd; --hl-2: #f7cec2; --hl-3: #f6c5b6; --hl-4: #f5bcab;
+  --hl-5: #f3b3a0; --hl-6: #f2aa94; --hl-7: #f0a189;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --wall: #f7ece8;
+    --wall-deep: #efdcd6;
+    --ink: #2b2726;
+    --ink-soft: #64544f;
+    --rule: #e2cac3;
+    --ink-faint: #6f5c57;
+    --error: #b3261e;
+    --axis: #d3b2a8;
+    --ray: #d9481f;
+    --ray-bright: #e4522a;
+    --hl-1: #f9d7cd; --hl-2: #f7cec2; --hl-3: #f6c5b6; --hl-4: #f5bcab;
+    --hl-5: #f3b3a0; --hl-6: #f2aa94; --hl-7: #f0a189;
+    color-scheme: light;
+  }
+}
+
 *, *::before, *::after { box-sizing: border-box; }
 
 html {
@@ -44,7 +87,7 @@ html {
   scrollbar-gutter: stable;
   -webkit-text-size-adjust: 100%;
 }
-html.lb-open { overflow: hidden; background: var(--wall-deep); }
+html.lb-open { overflow: hidden; background: #1b1b1a; }
 
 body {
   margin: 0;
@@ -111,15 +154,15 @@ img, svg { display: block; }
   min-height: 44px;
   padding: 0 20px;
   border-radius: 999px;
-  background: var(--ray);
-  color: var(--wall-deep);
+  background: var(--cta);
+  color: var(--on-ray);
   font-family: var(--brand);
   font-weight: 700;
   letter-spacing: -0.01em;
   text-decoration: none;
   transition: background-color 0.2s ease-out, transform 0.2s ease-out;
 }
-.nav-cta:hover { background: var(--ray-bright); transform: translateY(-1px); }
+.nav-cta:hover { background: var(--cta-hover); transform: translateY(-1px); }
 .nav-cta:active { transform: translateY(0); }
 @media (prefers-reduced-motion: reduce) { .nav-cta, .nav-cta:hover { transition: none; transform: none; } }
 [hidden] { display: none !important; }
@@ -216,6 +259,52 @@ img, svg { display: block; }
 }
 @keyframes slash-in { from { transform: rotate(-45deg) scale(0.5); } }
 
+/* Category highlighters. Each category word gets the next shade in order;
+   the shades are transparent in dark mode. */
+[data-nav-list] a.cat {
+  background: linear-gradient(var(--hl, transparent), var(--hl, transparent)) no-repeat 0 88% / 100% 0.34em;
+}
+[data-nav-list] a.cat:nth-of-type(7n+1) { --hl: var(--hl-1); }
+[data-nav-list] a.cat:nth-of-type(7n+2) { --hl: var(--hl-2); }
+[data-nav-list] a.cat:nth-of-type(7n+3) { --hl: var(--hl-3); }
+[data-nav-list] a.cat:nth-of-type(7n+4) { --hl: var(--hl-4); }
+[data-nav-list] a.cat:nth-of-type(7n+5) { --hl: var(--hl-5); }
+[data-nav-list] a.cat:nth-of-type(7n+6) { --hl: var(--hl-6); }
+[data-nav-list] a.cat:nth-of-type(7n+7) { --hl: var(--hl-7); }
+
+/* Dark / light switch. Hidden until the script has worked out the mode. */
+.theme-toggle {
+  display: none;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.2s ease-out, transform 0.3s ease-out;
+}
+:root[data-mode] .theme-toggle { display: grid; }
+.theme-toggle:hover { border-color: var(--ink-soft); }
+.theme-toggle:focus-visible { outline: 2px solid var(--ray); outline-offset: 3px; }
+.theme-toggle svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+.theme-toggle .i-moon { display: none; }
+:root[data-mode="light"] .theme-toggle .i-sun { display: none; }
+:root[data-mode="light"] .theme-toggle .i-moon { display: block; }
+@media (max-width: 400px) {
+  .site-header .site-nav { gap: 12px; }
+  .theme-toggle { width: 36px; height: 36px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .theme-toggle:active { transform: rotate(-30deg); }
+  :root.theme-fade, :root.theme-fade body, :root.theme-fade *:not(.lightbox):not(.lightbox *) {
+    transition: background-color 0.35s ease-out, color 0.35s ease-out, border-color 0.35s ease-out !important;
+  }
+}
+
 /* In the word lists, one orange slash travels between categories instead.
    It sits exactly over the active word's own slash, which hides. */
 .has-ray { position: relative; }
@@ -254,6 +343,10 @@ img, svg { display: block; }
   font-size: clamp(30px, 3.6vw, 56px);
   line-height: 1.15;
 }
+@media (max-width: 480px) {
+  /* Seven categories: a size that wraps to about three lines on a phone. */
+  :root[data-nav="path"] .paths { gap: 0.1em 0.5em; font-size: clamp(24px, 7vw, 30px); }
+}
 
 /* Layout "covers": a photo card per category. */
 :root[data-nav="covers"] .covers {
@@ -264,6 +357,9 @@ img, svg { display: block; }
   margin-bottom: clamp(36px, 6vh, 60px);
 }
 .cover {
+  /* Labels sit on the photo's dark fade, so they stay light in both modes. */
+  --ink: #edebe6;
+  --ink-soft: #c9c6bf;
   position: relative;
   display: block;
   aspect-ratio: 4 / 3;
@@ -787,6 +883,11 @@ select.cp-input option { background: var(--wall-deep); color: var(--ink); }
 /* ---------------------------------------------------------------- lightbox */
 
 .lightbox {
+  /* The viewer stays dark in both modes: photos are judged on grey. */
+  --wall: #292a29; --wall-deep: #1b1b1a; --ink: #edebe6; --ink-soft: #a6a49e;
+  --rule: #4a4a47; --ink-faint: #82817b; --ray: #e4522a;
+  color-scheme: dark;
+  color: var(--ink);
   position: fixed;
   inset: 0;
   z-index: 50;
