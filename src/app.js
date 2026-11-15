@@ -353,7 +353,8 @@
     if (!width) return;
     lastWidth = width;
     const gap = width < 720 ? 4 : 8;
-    const target = width < 520 ? 150 : width < 900 ? 220 : width < 1500 ? 300 : 360;
+    // Row height to aim for. On phones 240 puts two upright photos side by side.
+    const target = width < 520 ? 240 : width < 900 ? 290 : width < 1500 ? 380 : 440;
     const tiles = gallery.children;
     const photos = current.photos;
     let top = 0;

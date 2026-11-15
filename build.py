@@ -41,7 +41,7 @@ THEME_TOGGLE = (
 )
 
 # Image settings. Changing any of these re-processes every photo.
-GRID_BOX = (2400, 720)   # gallery thumbnails: fit inside this box
+GRID_BOX = (2400, 900)   # gallery thumbnails: fit inside this box (sharp at the bigger rows)
 FULL_EDGE = 2400         # full-screen viewer: longest edge
 GRID_QUALITY = 78
 FULL_QUALITY = 84
