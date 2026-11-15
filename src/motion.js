@@ -156,8 +156,8 @@
   const scrollDriven = window.CSS && CSS.supports && CSS.supports('animation-timeline: view()');
   root.classList.add(scrollDriven ? 'fx-scroll' : 'fx-io');
   if (!scrollDriven && 'IntersectionObserver' in window) {
-    const SEL = '.hero .wordmark, .hero .tagline, .hero .paths, #gallery .tile, #gallery .video, #gallery .roll-card, ' +
-      '.roll-head > *, .about h2, .about-body > *, .contact h2, .contact-body > *, .site-footer';
+    const SEL = '.hero .wordmark, .hero .tagline, .hero .paths, #gallery .tile, #gallery .video, .story-card, ' +
+      '.story-head > *, .story-more, .about h2, .about-body > *, .contact h2, .contact-body > *, .site-footer';
     const io = new IntersectionObserver((entries) => {
       for (const e of entries) {
         const above = !e.isIntersecting && e.boundingClientRect.top < (e.rootBounds ? e.rootBounds.top : 0);

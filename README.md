@@ -85,30 +85,34 @@ What you can change in `site.json`:
 Spam: a hidden field that only bots fill in blocks most junk. If spam still
 gets through, Web3Forms can add a captcha.
 
-## Rolls: shoots with a story
+## Stories: shoots with the story behind them
 
-A roll is one shoot with its own page: a big title, where and when, who it was for,
-the camera you used, and a few lines in your own words, then the photos. They're
-listed under **/rolls** next to the categories (it appears once you have one).
+A story is one shoot with its own page: a big title, the client, where and when, the
+camera you used, and a few lines in your own words, with the photos underneath. It
+lives inside a category: a client shoot with `category: business` shows as a card in
+**/business**; visitors tap **Read the story** to open it. Any of its photos opened
+elsewhere on the site (in /all, say) shows a **behind the shot** link to the story.
 
-1. In `photos/rolls`, create a folder for the shoot, starting with a number:
-   `03-brunch-at-the-corner-cafe`. On GitHub: **Add file → Create new file** and type
-   `03-brunch-at-the-corner-cafe/story.txt` as the name (the `/` makes the folder).
-2. Fill in `story.txt` (copy the example from `photos/rolls/story-template.txt`):
+1. In `photos/stories`, create a folder for the shoot, starting with a number:
+   `01-kings-barber`. On GitHub: **Add file → Create new file** and type
+   `01-kings-barber/story.txt` as the name (the `/` makes the folder).
+2. Fill in `story.txt` (copy the example from `photos/stories/story-template.txt`):
    ```
-   title: Brunch at the Corner Cafe
+   title: Fresh cuts at Kings Barber
+   client: Kings Barber
    place: Port Coquitlam
    date: November 2026
-   client: Corner Cafe
    category: business
-   cover: 02-eggs-benny.jpg
+   cover: 03-fade-closeup.jpg
 
    A few lines about the shoot, in your own words.
    ```
 3. Upload the shoot's photos into that folder.
 
-The newest roll (highest number) shows first. With `category:` set, the roll's photos
-also appear in that category, and anyone opening one of them sees a link to the roll.
+The newest story (highest number) shows first. A story can also use photos that are
+already in your category folders instead of new uploads: add a line such as
+`photos: street/01-DSC00496.jpg, landscapes/01-DSC00707.jpg` and leave `category` out;
+those photos stay where they are and get a **behind the shot** link.
 
 ## Adding photos
 

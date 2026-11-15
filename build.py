@@ -277,7 +277,7 @@ def add_files(folder, entry, jobs):
 
 STORY_KEYS = {"title": "title", "place": "place", "where": "place", "location": "place",
               "date": "date", "when": "date", "client": "client", "business": "client",
-              "category": "category", "cover": "cover"}
+              "category": "category", "cover": "cover", "photos": "photos"}
 
 
 def read_story(folder):
@@ -294,7 +294,13 @@ def read_story(folder):
         line = lines[i].strip()
         m = re.match(r"^([A-Za-z]+)\s*:\s*(.*)$", line)
         if m and m.group(1).lower() in STORY_KEYS:
-            story[STORY_KEYS[m.group(1).lower()]] = m.group(2).strip()
+            key = STORY_KEYS[m.group(1).lower()]
+            value = m.group(2).strip()
+            if key == "photos":
+                # Photos already in category folders, e.g. "street/01-DSC00496.jpg, landscapes/02-x.jpg"
+                story["photos"] = [p.strip().strip("/") for p in value.split(",") if p.strip()]
+            else:
+                story[key] = value
             i += 1
         elif not line:
             i += 1
@@ -321,17 +327,20 @@ def collect(config):
         else:
             warn(f"folder photos/{cat['folder']} doesn't exist, so that category is empty")
         categories.append(entry)
-    # Rolls: one folder per shoot under photos/rolls, each with its own story.
-    rolls_dir = PHOTOS / "rolls"
-    if rolls_dir.is_dir():
-        folders = sorted((d for d in rolls_dir.iterdir() if d.is_dir() and not d.name.startswith(".")),
-                         key=lambda p: natural_key(p.name))
+    # Stories: one folder per shoot under photos/stories, each with a story.txt.
+    folders = []
+    for name in ("stories", "rolls"):
+        base = PHOTOS / name
+        if base.is_dir():
+            folders += [d for d in base.iterdir() if d.is_dir() and not d.name.startswith(".")]
+    folders.sort(key=lambda p: natural_key(p.name))
+    if folders:
         for folder in folders:
             story = read_story(folder)
             slug = slugify(strip_order_prefix(folder.name)) or "roll"
             name = re.sub(r"[_-]+", " ", strip_order_prefix(folder.name)).strip()
             story.setdefault("title", name[:1].upper() + name[1:])
-            entry = {"id": "roll-" + slug, "label": story["title"], "cover": story.get("cover", ""),
+            entry = {"id": "story-" + slug, "label": story["title"], "cover": story.get("cover", ""),
                      "files": [], "roll": story, "folder": folder}
             add_files(folder, entry, jobs)
             categories.append(entry)
@@ -447,7 +456,7 @@ def build():
         if photos:
             # The cover card uses the photo named in site.json, else the first one.
             chosen = cover if cover else photos[0]
-            if cat["cover"] and not cover:
+            if cat["cover"] and not cover and "roll" not in cat:
                 warn(f"cover '{cat['cover']}' wasn't found in photos/{cat['id']}, using the first photo")
             entry["cover"], entry["coverColor"] = chosen["g"], chosen["c"]
         data_categories.append(entry)
@@ -455,22 +464,43 @@ def build():
     # Rolls: each shoot keeps its own page; its photos also join the category it names.
     rolls = [c for c in data_categories if "roll" in c]
     data_categories = [c for c in data_categories if "roll" not in c]
+    by_path = {path.relative_to(PHOTOS).as_posix().lower(): photo for path, photo in all_photos}
+    file_of = {photo["id"]: path.name for path, photo in all_photos}
     data_rolls = []
     for number, roll in enumerate(rolls, start=1):
         story, where = roll["roll"], roll["folder"]
+        # A roll can also borrow photos that live in the category folders.
+        borrowed = []
+        for ref in story.get("photos", []):
+            photo = by_path.get(ref.lower())
+            if photo is None:
+                warn(f"'{ref}' in story.txt wasn't found under photos/", where)
+                continue
+            photo["r"] = roll["id"]
+            borrowed.append(photo)
+        if borrowed:
+            roll["photos"] = borrowed + roll["photos"]
+            chosen = next((p for p in roll["photos"] if story.get("cover") and file_of[p["id"]] == story["cover"]),
+                          roll["photos"][0])
+            roll["cover"], roll["coverColor"] = chosen["g"], chosen["c"]
         if not roll["photos"]:
             warn("this roll has no photos yet, so it's hidden", where)
             continue
         wanted = story.get("category", "").strip()
+        home = ""
         if wanted:
             target = next((c for c in data_categories
                            if c["id"] == slugify(wanted) or c["label"].lower() == wanted.lower()), None)
             if target is None:
                 warn(f"category '{wanted}' in story.txt doesn't match a category in site.json", where)
             else:
-                for photo in roll["photos"]:
+                home = target["id"]
+                own = [p for p in roll["photos"] if p not in borrowed]
+                for photo in own:
                     photo["r"] = roll["id"]
                     target["photos"].append(photo)
+                # Keep the category in filename order (01-, 02-...) with the roll's photos mixed in.
+                target["photos"].sort(key=lambda p: natural_key(file_of[p["id"]]))
                 if "cover" not in target:
                     target["cover"], target["coverColor"] = roll["cover"], roll["coverColor"]
         shot = []
@@ -479,7 +509,7 @@ def build():
             if camera and camera not in shot:
                 shot.append(camera)
         data_rolls.append({
-            "id": roll["id"], "n": number, "title": story["title"],
+            "id": roll["id"], "n": number, "title": story["title"], "category": home,
             "place": story.get("place", ""), "date": story.get("date", ""),
             "client": story.get("client", ""), "story": story["paragraphs"], "shot": shot,
             "cover": roll["cover"], "coverColor": roll["coverColor"], "photos": roll["photos"],
@@ -682,7 +712,7 @@ def build():
 
     counts = ", ".join(f"{c['label']} {len(c['photos'])}" for c in data_categories)
     print(f"Built dist/ with {sum(len(c['photos']) for c in data_categories)} photo(s): {counts}"
-          + (f", {len(data_rolls)} roll(s)" if data_rolls else "")
+          + (f", {len(data_rolls)} stor{'y' if len(data_rolls) == 1 else 'ies'}" if data_rolls else "")
           + (f", {len(videos)} video(s)" if videos else ""))
     if not any(c["photos"] for c in data_categories):
         warn("no photos found yet. Add some to the photos/ folders.")

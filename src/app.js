@@ -23,25 +23,28 @@
 
   /* ------------------------------------------------------------ views */
 
-  const categories = data.categories.filter((c) => c.photos.length);
+  // Stories: a shoot with its write-up. A story that names a category (a client shoot
+  // under Business, say) shows there as a card; its photos then live inside the story
+  // instead of in that category's grid. Every story photo links to its story from the
+  // viewer ("behind the shot").
+  const stories = (data.rolls || []).map((r) => ({ ...r, label: r.title, isStory: true }));
+  const categories = data.categories.map((c) => {
+    const own = stories.filter((st) => st.category === c.id);
+    const inStory = new Set(own.map((st) => st.id));
+    return { ...c, every: c.photos, stories: own, photos: c.photos.filter((p) => !inStory.has(p.r)) };
+  }).filter((c) => c.photos.length || c.stories.length);
   const views = [];
   if (categories.length > 1) {
-    const all = interleave(categories.map((c) => c.photos));
+    const all = interleave(categories.map((c) => c.every));
     // Give the "all" card a photo no category card is already using.
     const used = new Set(categories.map((c) => c.cover));
     const pick = all.find((p) => !used.has(p.g)) || all[0];
     views.push({ id: 'all', label: 'All', photos: all, cover: pick.g, coverColor: pick.c });
   }
   categories.forEach((c) => views.push({
-    id: c.id, label: c.label, photos: c.photos, cover: c.cover, coverColor: c.coverColor,
+    id: c.id, label: c.label, photos: c.photos, stories: c.stories, cover: c.cover, coverColor: c.coverColor,
   }));
-  // Rolls: one page per shoot with its story. "/rolls" lists them; each roll is its
-  // own view (reached from the list, not the category words).
-  const rollViews = (data.rolls || []).map((r) => ({ ...r, label: r.title, isRoll: true }));
-  if (rollViews.length) {
-    views.push({ id: 'rolls', label: 'Rolls', rolls: rollViews, cover: rollViews[0].cover, coverColor: rollViews[0].coverColor });
-  }
-  const findView = (id) => views.find((v) => v.id === id) || rollViews.find((v) => v.id === id);
+  const findView = (id) => views.find((v) => v.id === id) || stories.find((v) => v.id === id);
   if (data.videos.length) {
     views.push({
       id: 'video', label: 'Video', videos: data.videos,
@@ -65,7 +68,8 @@
     return '#/' + view.id + (photo ? '/' + photo.id : '');
   }
 
-  const countOf = (view) => (view.photos || view.videos || view.rolls).length;
+  const countOf = (view) => (view.photos || view.videos).length
+    + (view.stories || []).reduce((n, st) => n + st.photos.length, 0);
   const nameOf = (view) => view.label.toLowerCase();
 
   /* ------------------------------------------------------------ category navigation */
@@ -77,7 +81,7 @@
     link.className = 'cat';
     link.href = '#/' + view.id;
     link.dataset.view = view.id;
-    link.setAttribute('aria-label', view.label + ', ' + countOf(view) + (view.videos ? ' videos' : view.rolls ? ' shoots' : ' photos'));
+    link.setAttribute('aria-label', view.label + ', ' + countOf(view) + (view.videos ? ' videos' : ' photos'));
     const slash = document.createElement('span');
     slash.className = 'sl';
     slash.setAttribute('aria-hidden', 'true');
@@ -125,7 +129,7 @@
   }
 
   function markActive(view) {
-    const navId = view.isRoll ? 'rolls' : view.id;
+    const navId = view.isStory ? view.category || '' : view.id;
     for (const link of document.querySelectorAll('a[data-view]')) {
       if (link.dataset.view === navId && !link.closest('.roll-head')) link.setAttribute('aria-current', 'true');
       else link.removeAttribute('aria-current');
@@ -164,14 +168,14 @@
     markActive(view);
     positionRays(animate);
     // Moving right through the list slides photos left, and back again.
-    const place = (v) => views.indexOf(v && v.isRoll ? findView('rolls') : v) + (v && v.isRoll ? 0.5 : 0);
+    const place = (v) => (v && v.isStory ? views.indexOf(findView(v.category)) + 0.5 : views.indexOf(v));
     const direction = previous ? Math.sign(place(view) - place(previous)) || 1 : 1;
     const token = ++switchToken;
     const render = () => {
       if (token !== switchToken) return;
-      renderRollHead(view);
+      renderStoryHead(view);
+      renderStoryCards(view, animate ? direction : 0);
       if (view.videos) renderVideos(view, animate ? direction : 0);
-      else if (view.rolls) renderRolls(view, animate ? direction : 0);
       else renderPhotos(view, animate ? direction : 0);
     };
     if (animate && !reduceMotion.matches && gallery.children.length) leaveGallery(direction).then(render);
@@ -234,7 +238,7 @@
     if (!view) return;
     setHistory('pushState', hashFor(view));
     if (view !== current) show(view, { animate: true });
-    if (link.closest('#nav-covers') || link.closest('#catbar') || link.closest('.roll-card') || link.closest('.roll-head')
+    if (link.closest('#nav-covers') || link.closest('#catbar') || link.closest('.story-card') || link.closest('.story-head')
       || work.getBoundingClientRect().top < 0) {
       scrollToGallery();
     }
@@ -401,14 +405,19 @@
     openViewer(current, Number(tile.dataset.index), { opener: tile });
   });
 
-  /* ------------------------------------------------------------ rolls */
+  /* ------------------------------------------------------------ stories */
 
-  const rollHead = document.createElement('header');
-  rollHead.className = 'roll-head';
-  rollHead.hidden = true;
-  gallery.before(rollHead);
+  // Cards for the category's stories sit above its photos; a story's own page
+  // (title, details, write-up) sits above the story's photos.
+  const storyRow = document.createElement('section');
+  storyRow.className = 'story-row';
+  storyRow.hidden = true;
+  storyRow.setAttribute('aria-label', 'Stories');
+  const storyHead = document.createElement('header');
+  storyHead.className = 'story-head';
+  storyHead.hidden = true;
+  gallery.before(storyRow, storyHead);
 
-  const pad = (n) => String(n).padStart(2, '0');
   const el = (tag, cls, text) => {
     const node = document.createElement(tag);
     if (cls) node.className = cls;
@@ -421,58 +430,60 @@
     return node;
   };
 
-  // A shoot's page: its number, title, where / when / who, and the story in your words.
-  function renderRollHead(view) {
-    if (!view.isRoll) {
-      rollHead.hidden = true;
-      rollHead.replaceChildren();
+  function renderStoryHead(view) {
+    if (!view.isStory) {
+      storyHead.hidden = true;
+      storyHead.replaceChildren();
       return;
     }
-    const back = el('a', 'cat roll-back');
-    back.href = '#/rolls';
-    back.dataset.view = 'rolls';
-    back.append(el('span', 'sl', '/'), 'all rolls');
-    const title = el('h2', 'roll-title', view.title);
-    title.id = 'roll-title';
-    const meta = el('dl', 'roll-meta');
-    for (const [label, value] of [['place', view.place], ['date', view.date], ['client', view.client],
+    const home = findView(view.category) || views[0];
+    const back = el('a', 'cat story-back');
+    back.href = '#/' + home.id;
+    back.dataset.view = home.id;
+    back.append(el('span', 'sl', '/'), home.label.toLowerCase());
+    const title = el('h2', 'story-title', view.title);
+    title.id = 'story-title';
+    const meta = el('dl', 'story-meta');
+    for (const [label, value] of [['client', view.client], ['place', view.place], ['date', view.date],
       ['shot on', (view.shot || []).join(', ')]]) {
       if (!value) continue;
       const row = el('div', 'lb-set');
       row.append(el('dt', null, label), el('dd', null, value));
       meta.append(row);
     }
-    const story = el('div', 'roll-story');
+    const story = el('div', 'story-text');
     for (const text of view.story || []) story.append(el('p', null, text));
-    rollHead.replaceChildren(back, slashed('roll-no', 'roll ' + pad(view.n)), title,
+    storyHead.replaceChildren(back, slashed('story-kicker', 'the story'), title,
       ...(meta.children.length ? [meta] : []), ...(story.children.length ? [story] : []));
-    rollHead.setAttribute('aria-labelledby', 'roll-title');
-    rollHead.hidden = false;
+    storyHead.setAttribute('aria-labelledby', 'story-title');
+    storyHead.hidden = false;
   }
 
-  // "/rolls": a card per shoot, newest first.
-  function renderRolls(view, direction) {
+  function renderStoryCards(view, direction) {
+    const list = view.isStory ? [] : view.stories || [];
+    storyRow.hidden = !list.length;
+    if (!list.length) { storyRow.replaceChildren(); return; }
     const animate = Boolean(direction) && !reduceMotion.matches;
-    gallery.className = 'rolls';
-    gallery.style.height = '';
-    gallery.replaceChildren(...view.rolls.map((roll, index) => {
-      const card = el('a', 'roll-card');
-      card.href = '#/' + roll.id;
-      card.dataset.view = roll.id;
+    const grid = el('div', 'story-grid');
+    grid.append(...list.map((st, index) => {
+      const card = el('a', 'story-card');
+      card.href = '#/' + st.id;
+      card.dataset.view = st.id;
       if (animate) enter(card, index, direction);
-      const frame = el('span', 'roll-cover');
-      frame.style.backgroundColor = roll.coverColor || '';
+      const frame = el('span', 'story-cover');
+      frame.style.backgroundColor = st.coverColor || '';
       const img = el('img');
       img.alt = '';
       img.loading = 'lazy';
       img.decoding = 'async';
-      img.src = roll.cover;
-      frame.append(img, el('span', 'roll-count', roll.photos.length + ' photos'));
-      const where = [roll.place, roll.date].filter(Boolean).join(', ');
-      card.append(frame, slashed('roll-no', 'roll ' + pad(roll.n)), el('span', 'roll-name', roll.title),
-        ...(where ? [el('span', 'roll-where', where)] : []));
+      img.src = st.cover;
+      frame.append(img, el('span', 'story-count', st.photos.length + ' photos'));
+      const where = [st.place, st.date].filter(Boolean).join(', ');
+      card.append(frame, slashed('story-kicker', st.client || 'story'), el('span', 'story-name', st.title),
+        ...(where ? [el('span', 'story-where', where)] : []), el('span', 'story-open', 'Read the story'));
       return card;
     }));
+    storyRow.replaceChildren(grid, ...(view.photos.length ? [slashed('story-more', 'more photos')] : []));
   }
 
   /* ------------------------------------------------------------ videos */
@@ -599,7 +610,7 @@
       row.append(dd);
       return row;
     }));
-    const roll = photo.r && photo.r !== viewer.view.id ? findView(photo.r) : null;
+    const roll = photo.r && photo.r !== viewer.view.id ? findView(photo.r) : null;   // its story
     vRoll.hidden = !roll;
     if (roll) {
       vRoll.href = '#/' + roll.id;
