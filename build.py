@@ -277,7 +277,22 @@ def add_files(folder, entry, jobs):
 
 STORY_KEYS = {"title": "title", "place": "place", "where": "place", "location": "place",
               "date": "date", "when": "date", "client": "client", "business": "client",
-              "category": "category", "cover": "cover", "photos": "photos"}
+              "category": "category", "cover": "cover", "photos": "photos",
+              "quote": "quote", "said": "quote", "by": "quote_by",
+              "link": "link", "website": "link", "instagram": "link",
+              "delivered": "delivered", "deliverables": "delivered"}
+
+
+def story_link(value):
+    """A client's website or @instagram as a safe https link (anything else is dropped)."""
+    v = str(value or "").strip()
+    if v.startswith("@") and re.fullmatch(r"@[\w.]{1,30}", v):
+        return "https://instagram.com/" + v[1:]
+    if re.match(r"^https?://[^\s\"'<>]+$", v, re.I):
+        return v
+    if re.fullmatch(r"[\w.-]+\.[a-z]{2,}(/[^\s\"'<>]*)?", v, re.I):
+        return "https://" + v
+    return ""
 
 
 def read_story(folder):
@@ -513,6 +528,11 @@ def build():
             "place": story.get("place", ""), "date": story.get("date", ""),
             "client": story.get("client", ""), "story": story["paragraphs"], "shot": shot,
             "cover": roll["cover"], "coverColor": roll["coverColor"], "photos": roll["photos"],
+            "hero": next((p["f"] for p in roll["photos"] if p["g"] == roll["cover"]), roll["photos"][0]["f"]),
+            "quote": story.get("quote", "").strip().strip('"\u201c\u201d'),
+            "quoteBy": story.get("quote_by", "") or story.get("client", ""),
+            "link": story_link(story.get("link", "")),
+            "delivered": story.get("delivered", ""),
         })
     data_rolls.reverse()   # newest roll (highest number) first
 

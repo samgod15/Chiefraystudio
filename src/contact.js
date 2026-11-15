@@ -14,6 +14,15 @@
   // The preview page sets this so the form can be tried without sending anything.
   const demo = Boolean(window.chiefRayDemo);
 
+  // Coming from a story's "Book a shoot like this": start the message for them.
+  try {
+    const about = new URLSearchParams(location.search).get('about');
+    const message = form.querySelector('#f-message');
+    if (about && message && !message.value) {
+      message.value = 'I saw "' + about.slice(0, 120) + '" on your site and I\'d like a shoot like that. ';
+    }
+  } catch (e) { /* no query string support: leave the form empty */ }
+
   /* ------------------------------------------------------------ travelling slash on the shoot types */
 
   function placeRay(animate) {

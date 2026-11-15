@@ -235,7 +235,7 @@ img, svg { display: block; }
    something crosses the edge of the screen (motion.js picks which). */
 @media (prefers-reduced-motion: no-preference) {
   :root.fx-scroll :is(.hero .wordmark, .hero .tagline, .hero .paths, #gallery .tile:not(.is-entering),
-    #gallery .video:not(.is-entering), .story-card:not(.is-entering), .story-head > *, .story-more,
+    #gallery .video:not(.is-entering), .story-card:not(.is-entering), .story-head > *, .story-more, .story-foot > *,
     .about h2, .about-body > *, .contact h2, .contact-body > *, .site-footer) {
     animation: fx-in linear both, fx-out linear both;
     animation-timeline: view(), view();
@@ -946,7 +946,8 @@ select.cp-input option { background: var(--wall-deep); color: var(--ink); }
 }
 
 /* A story's own page: the write-up sits above its photos. */
-.story-head { display: grid; gap: 10px; max-width: 760px; margin: 0 0 clamp(28px, 4vw, 48px); }
+.story-head { display: grid; gap: 10px; margin: 0 0 clamp(28px, 4vw, 48px); }
+.story-head > :not(.story-hero) { max-width: 760px; }
 .story-head[hidden] { display: none; }
 .story-back { justify-self: start; padding: 6px 0; font-size: 17px; }
 .story-head .story-kicker { margin-top: 6px; }
@@ -954,8 +955,48 @@ select.cp-input option { background: var(--wall-deep); color: var(--ink); }
 .story-meta { display: flex; flex-wrap: wrap; gap: 10px clamp(18px, 2.4vw, 34px); margin: 8px 0 4px; font-family: var(--brand); }
 .story-text p { max-width: 62ch; margin: 0 0 0.9em; font-size: clamp(18px, 1.45vw, 21px); line-height: 1.62; }
 .story-text p:last-child { margin-bottom: 0; }
-:root[data-nav="index"] .story-row, :root[data-nav="index"] .story-head { grid-column: 2; }
-:root[data-nav="index"] .side { grid-row: 1 / span 3; }
+/* The lead photo runs edge to edge; tap it to open the photos. */
+.story-hero {
+  display: block; width: auto; height: clamp(260px, 58vh, 660px);
+  margin: 4px calc(-1 * var(--gutter)) clamp(14px, 2vw, 24px); padding: 0; border: 0;
+  overflow: hidden; cursor: zoom-in; background: var(--wall-deep);
+}
+.story-hero img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.story-hero:focus-visible { outline: 2px solid var(--ray); outline-offset: -4px; }
+.story-link { color: inherit; text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.story-link:hover { color: var(--accent); }
+
+/* The client's own words. */
+.story-quote { margin: clamp(10px, 2vw, 20px) 0 0; padding-left: clamp(16px, 2vw, 24px); border-left: 3px solid var(--accent); }
+.story-quote blockquote { margin: 0; }
+.story-quote p { margin: 0; font-family: var(--brand); font-weight: 700; font-size: clamp(22px, 2.4vw, 32px); line-height: 1.3; letter-spacing: -0.01em; }
+.story-quote-by { display: block; margin-top: 10px; color: var(--ink-soft); font-family: var(--brand); font-size: 15px; }
+.story-quote-by .sl { margin-right: 1px; color: var(--accent); font-weight: 700; }
+
+/* After the photos: book a shoot like this, or read the next story. */
+.story-foot {
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+  gap: 24px 40px; margin-top: clamp(36px, 5vw, 64px); padding-top: clamp(24px, 3vw, 34px);
+  border-top: 1px solid var(--rule);
+}
+.story-foot[hidden] { display: none; }
+.story-cta { display: grid; gap: 14px; justify-items: start; max-width: 30ch; }
+.story-cta-title { margin: 0; font-family: var(--brand); font-weight: 700; font-size: clamp(22px, 2.2vw, 30px); line-height: 1.2; letter-spacing: -0.01em; }
+.story-next { display: grid; gap: 2px; justify-items: end; text-align: right; color: var(--ink); text-decoration: none; }
+.story-next .story-name { text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.story-next:hover .story-name { color: var(--accent); }
+
+/* The newest story leads, wide. */
+.story-grid > .story-card:first-child:not(:only-child), .story-grid > .story-card:only-child { grid-column: 1 / -1; }
+.story-grid > .story-card:first-child .story-cover { aspect-ratio: 16 / 9; max-height: 62vh; }
+.story-grid > .story-card:first-child .story-name { font-size: clamp(24px, 2.6vw, 34px); }
+@media (max-width: 560px) {
+  .story-grid > .story-card:first-child .story-cover { aspect-ratio: 4 / 3; }
+  .story-next { justify-items: start; text-align: left; }
+}
+
+:root[data-nav="index"] .story-row, :root[data-nav="index"] .story-head, :root[data-nav="index"] .story-foot { grid-column: 2; }
+:root[data-nav="index"] .side { grid-row: 1 / span 4; }
 
 /* In the viewer: "behind the shot", the story this photo belongs to. */
 .lb-roll { display: grid; gap: 1px; color: var(--ink); text-decoration: none; font-family: var(--brand); }

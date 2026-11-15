@@ -100,14 +100,26 @@ elsewhere on the site (in /all, say) shows a **behind the shot** link to the sto
    ```
    title: Fresh cuts at Kings Barber
    client: Kings Barber
+   link: @theirhandle
    place: Port Coquitlam
    date: November 2026
    category: business
    cover: 03-fade-closeup.jpg
+   delivered: 24 edited photos, 3 reels
+   quote: What the client said about the photos, in their words.
+   by: Their name, owner
 
    A few lines about the shoot, in your own words.
    ```
+   Only `title` is needed. `link` (their Instagram or website) turns the client's name
+   into a link; `delivered` lists what you handed over; `quote` and `by` show the
+   client's own words (use real words, with their OK).
 3. Upload the shoot's photos into that folder.
+
+The story page opens with the cover photo full width, then the story and the quote,
+then the photos, then a **Book a shoot like this** button (it opens the contact form
+with the shoot already named in the message) and a link to the next story. In the
+category, the newest story gets the big card at the top.
 
 The newest story (highest number) shows first. A story can also use photos that are
 already in your category folders instead of new uploads: add a line such as

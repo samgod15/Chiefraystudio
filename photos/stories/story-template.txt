@@ -7,18 +7,24 @@ HOW TO ADD A STORY (one shoot, its photos and the story behind it)
 2. Fill in story.txt like the example below and commit it.
 3. Open the new folder and upload the shoot's photos into it.
 
-With "category: business" the shoot shows up as a card in /business. Visitors tap
-the card ("Read the story") and see your story with the photos underneath. Anyone
-who opens one of these photos elsewhere on the site also gets a "behind the shot"
-link to the story. The newest story (highest number) shows first.
+With "category: business" the shoot shows up as a card in /business (the newest
+story gets the big card at the top). Visitors tap it and get the story page: your
+cover photo big, the story, the client's words, then the photos, then a "Book a
+shoot like this" button that opens the contact form with the shoot already named.
+Anyone who opens one of these photos elsewhere on the site also gets a
+"behind the shot" link to the story.
 
 ---------- copy from here into story.txt ----------
 title: Fresh cuts at Kings Barber
 client: Kings Barber
+link: @[their instagram]
 place: Port Coquitlam
 date: November 2026
 category: business
 cover: 03-fade-closeup.jpg
+delivered: 24 edited photos, 3 reels
+quote: [what they said about the photos, in their words]
+by: [their name], owner
 
 A few lines in your own words: who it was for, what they needed, how the day went,
 what you were going for.
@@ -26,6 +32,12 @@ what you were going for.
 Leave an empty line between paragraphs.
 ---------- to here ----------
 
-Only "title" is needed. "category" is one of your categories (street, people,
-landscapes, business, b&w, film). "cover" is the photo used on the card; without it
-the first photo is used.
+Only "title" is needed; leave out any line you don't have.
+- category: one of your categories (street, people, landscapes, business, b&w, film).
+- cover: the photo shown big on the card and at the top of the story. Without it,
+  the first photo is used.
+- link: the client's Instagram (@handle) or website (https://...). Their name
+  becomes a link to it.
+- delivered: what you handed over, in a few words.
+- quote / by: something the client said about the shoot, and who said it. Only use
+  their real words, with their OK.

@@ -239,6 +239,7 @@
     setHistory('pushState', hashFor(view));
     if (view !== current) show(view, { animate: true });
     if (link.closest('#nav-covers') || link.closest('#catbar') || link.closest('.story-card') || link.closest('.story-head')
+      || link.closest('.story-foot')
       || work.getBoundingClientRect().top < 0) {
       scrollToGallery();
     }
@@ -430,10 +431,19 @@
     return node;
   };
 
+  const storyFoot = document.createElement('footer');
+  storyFoot.className = 'story-foot';
+  storyFoot.hidden = true;
+  gallery.after(storyFoot);
+
+  // A story's page: big lead photo, title, the details, your words, the client's
+  // words; the shoot's photos follow, then a way to book one like it.
   function renderStoryHead(view) {
     if (!view.isStory) {
       storyHead.hidden = true;
+      storyFoot.hidden = true;
       storyHead.replaceChildren();
+      storyFoot.replaceChildren();
       return;
     }
     const home = findView(view.category) || views[0];
@@ -441,22 +451,73 @@
     back.href = '#/' + home.id;
     back.dataset.view = home.id;
     back.append(el('span', 'sl', '/'), home.label.toLowerCase());
+
+    const hero = el('button', 'story-hero');
+    hero.type = 'button';
+    hero.setAttribute('aria-label', 'Open the first photo');
+    hero.style.backgroundColor = view.coverColor || '';
+    const heroImg = el('img');
+    heroImg.alt = '';
+    heroImg.decoding = 'async';
+    heroImg.src = view.hero || view.cover;
+    hero.append(heroImg);
+    hero.addEventListener('click', () => {
+      const index = Math.max(0, view.photos.findIndex((p) => p.f === view.hero));
+      openViewer(view, index, { opener: hero });
+    });
+
     const title = el('h2', 'story-title', view.title);
     title.id = 'story-title';
     const meta = el('dl', 'story-meta');
     for (const [label, value] of [['client', view.client], ['place', view.place], ['date', view.date],
-      ['shot on', (view.shot || []).join(', ')]]) {
+      ['delivered', view.delivered], ['shot on', (view.shot || []).join(', ')]]) {
       if (!value) continue;
       const row = el('div', 'lb-set');
-      row.append(el('dt', null, label), el('dd', null, value));
+      const dd = el('dd');
+      if (label === 'client' && view.link) {
+        const a = el('a', 'story-link', value);
+        a.href = view.link;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        dd.append(a);
+      } else dd.textContent = value;
+      row.append(el('dt', null, label), dd);
       meta.append(row);
     }
     const story = el('div', 'story-text');
     for (const text of view.story || []) story.append(el('p', null, text));
-    storyHead.replaceChildren(back, slashed('story-kicker', 'the story'), title,
-      ...(meta.children.length ? [meta] : []), ...(story.children.length ? [story] : []));
+    const parts = [back, hero, slashed('story-kicker', 'the story'), title];
+    if (meta.children.length) parts.push(meta);
+    if (story.children.length) parts.push(story);
+    if (view.quote) {
+      const quote = el('figure', 'story-quote');
+      const q = el('blockquote');
+      q.append(el('p', null, view.quote));
+      quote.append(q);
+      if (view.quoteBy) quote.append(slashed('story-quote-by', view.quoteBy));
+      parts.push(quote);
+    }
+    storyHead.replaceChildren(...parts);
     storyHead.setAttribute('aria-labelledby', 'story-title');
     storyHead.hidden = false;
+
+    // After the photos: book a shoot like this one, or read the next story.
+    const cta = el('div', 'story-cta');
+    const book = el('a', 'nav-cta', 'Book a shoot like this');
+    book.href = 'contact/?about=' + encodeURIComponent(view.title);
+    cta.append(el('p', 'story-cta-title', 'Want photos like these for your business?'), book);
+    const pool = view.category ? (findView(view.category).stories || []) : stories;
+    const next = pool.length > 1 ? pool[(pool.indexOf(view) + 1) % pool.length] : null;
+    const footParts = [cta];
+    if (next) {
+      const link = el('a', 'story-next');
+      link.href = '#/' + next.id;
+      link.dataset.view = next.id;
+      link.append(slashed('story-kicker', 'next story'), el('span', 'story-name', next.title));
+      footParts.push(link);
+    }
+    storyFoot.replaceChildren(...footParts);
+    storyFoot.hidden = false;
   }
 
   function renderStoryCards(view, direction) {
