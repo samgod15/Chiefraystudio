@@ -165,7 +165,8 @@ and open http://localhost:8000. Not required, since GitHub builds the site for y
 - **Logo motion.** When the page opens, the logo plays a "viewfinder" intro: framing
   guides appear, the letters drop in, the screen blinks like a shutter. After that, every
   7 seconds (and whenever someone taps the logo) it does an "autofocus": the word blurs,
-  the focus brackets hunt, then it snaps sharp. Content also fades in and out as you
+  the focus brackets hunt, then it snaps sharp and the framed area blinks like a
+  shutter. Content also fades in and out as you
   scroll. All of this lives in `src/motion.js`; set `"motion": false` in `site.json` to
   turn it off. It's also off for visitors whose phone is set to reduce motion.
 - `src/logo.svg` has one shape per letter so the letters can move; it looks identical

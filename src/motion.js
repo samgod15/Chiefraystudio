@@ -2,7 +2,8 @@
    - Viewfinder intro when the page opens: framing guides, letters drop in, the
      shutter blinks, the slash is there.
    - Autofocus every 7 seconds (and when the logo is tapped): the word blurs, the
-     brackets hunt, then it snaps sharp and the brackets lock in orange.
+     brackets hunt, then it snaps sharp, the brackets lock in orange and the framed
+     area blinks dark like the shutter firing.
    - Things fade and rise in as they come up the screen and fade out as they leave.
    All of it is off when "motion" is false in site.json or the visitor has asked
    their device to reduce motion. */
@@ -119,6 +120,13 @@
       [1560, { opacity: 1, transform: 'scale(1)', stroke: accent(), strokeWidth: '3px' }], [1700, { opacity: 1, stroke: accent(), strokeWidth: '3px' }],
       [D, { opacity: 0, transform: 'scale(.98)', stroke: accent() }]]);
     flash(1560);
+    // Focus locked, so the shutter fires: the framed area blinks dark for a moment
+    // (only inside the brackets), then the logo settles.
+    const shot = mk('rect', { x: B.x0, y: B.y0, width: B.x1 - B.x0, height: B.y1 - B.y0, fill: '#0d0d0c', opacity: 0 });
+    shot.animate([{ opacity: 0 }, { opacity: 0.9, offset: 0.25 }, { opacity: 0.9, offset: 0.45 }, { opacity: 0 }],
+      { duration: 260, delay: 1620, easing: 'ease-out' }).finished.then(() => shot.remove());
+    setTimeout(() => wordmark.animate([{ transform: 'scale(1.02)' }, { transform: 'none' }],
+      { duration: 500, easing: 'cubic-bezier(.2,.7,.2,1)' }), 1780);
     // Focus hunts: out, nearly in, out a little, then locks sharp.
     await drive(D, curve([[0, 0], [320, 7], [700, 1.2], [950, 3.6], [1250, 0.6], [1420, 1.6], [1560, 0], [D, 0]]),
       (v) => blur.setAttribute('stdDeviation', v.toFixed(2)));
