@@ -507,11 +507,11 @@
     storyHead.setAttribute('aria-labelledby', 'story-title');
     storyHead.hidden = false;
 
-    // After the photos: book a shoot like this one, or read the next story.
+    // After the photos: book a shoot, or read the next story.
     const cta = el('div', 'story-cta');
-    const book = el('a', 'nav-cta', 'Book a shoot like this');
+    const book = el('a', 'nav-cta', 'Book a shoot');
     book.href = 'contact/?about=' + encodeURIComponent(view.title);
-    cta.append(el('p', 'story-cta-title', 'Want photos like these for your business?'), book);
+    cta.append(el('p', 'story-cta-title', 'Want your business on here next?'), book);
     const pool = view.category ? (findView(view.category).stories || []) : stories;
     const next = pool.length > 1 ? pool[(pool.indexOf(view) + 1) % pool.length] : null;
     const footParts = [cta];

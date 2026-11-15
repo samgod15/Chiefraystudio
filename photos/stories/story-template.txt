@@ -10,7 +10,7 @@ HOW TO ADD A STORY (one shoot, its photos and the story behind it)
 With "category: business" the shoot shows up as a card in /business (the newest
 story gets the big card at the top). Visitors tap it and get the story page: your
 cover photo big, the story, the client's words, then the photos, then a "Book a
-shoot like this" button that opens the contact form with the shoot already named.
+shoot" button that opens the contact form with the story already named.
 Anyone who opens one of these photos elsewhere on the site also gets a
 "behind the shot" link to the story.
 

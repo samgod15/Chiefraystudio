@@ -117,7 +117,7 @@ elsewhere on the site (in /all, say) shows a **behind the shot** link to the sto
 3. Upload the shoot's photos into that folder.
 
 The story page opens with the cover photo full width, then the story and the quote,
-then the photos, then a **Book a shoot like this** button (it opens the contact form
+then the photos, then "Want your business on here next?" with a **Book a shoot** button (it opens the contact form
 with the shoot already named in the message) and a link to the next story. In the
 category, the newest story gets the big card at the top.
 
