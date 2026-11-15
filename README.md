@@ -50,6 +50,7 @@ Click `site.json` on GitHub, then the pencil icon, edit, and commit. The site re
 | `services` | The "What I shoot" list. |
 | `site_url` | Your domain, `"https://chiefraystudio.com"`. Makes link previews on Instagram and iMessage show your photo. |
 | `share_photo` | Which photo shows in link previews, e.g. `"street/03-gastown.jpg"`. Defaults to your first photo. |
+| `motion` | `true` for the logo intro, the autofocus animation and the fade on scroll. `false` for a still site. |
 | `nav_style` | How categories are shown: `"path"` (big /street /people words under the logo), `"covers"` (a photo card per category) or `"index"` (a list beside the gallery). |
 | `show_camera_settings` | Shows camera, focal length, aperture, shutter and ISO in the viewer. `false` to hide. |
 | `categories` | Rename a tab with `label`, or add a category: add a line here and create the matching folder under `photos/`. Add `"cover": "03-gastown.jpg"` to pick the photo on that category's cover card (otherwise the first photo is used). |
@@ -158,8 +159,17 @@ and open http://localhost:8000. Not required, since GitHub builds the site for y
 
 - The big logo at the top is `src/logo.svg`; the small f/ in the header is `src/mark.svg`.
   Both are outlines, so they look the same everywhere with no font to load.
-- The accent colour (the slash, the active tab underline, focus rings) is `--ray`
-  near the top of `src/styles.css`: Safelight `#e4522a`.
+- The accent colour (the slashes, the Contact button) is `--accent` near the top of
+  `src/styles.css`: Safelight `#ee6a43`. `--ray` is the same orange for focus rings and
+  underlines (a deeper orange in light mode so they stay easy to see).
+- **Logo motion.** When the page opens, the logo plays a "viewfinder" intro: framing
+  guides appear, the letters drop in, the screen blinks like a shutter. After that, every
+  7 seconds (and whenever someone taps the logo) it does an "autofocus": the word blurs,
+  the focus brackets hunt, then it snaps sharp. Content also fades in and out as you
+  scroll. All of this lives in `src/motion.js`; set `"motion": false` in `site.json` to
+  turn it off. It's also off for visitors whose phone is set to reduce motion.
+- `src/logo.svg` has one shape per letter so the letters can move; it looks identical
+  to the logo in the logo pack.
 - **Dark and light mode.** The site follows the visitor's phone or computer setting, and
   the round sun/moon button in the header switches it (remembered on that device).
   Dark mode is charcoal; light mode is soft blush with category highlighters in shades

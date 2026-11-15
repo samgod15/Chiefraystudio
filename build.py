@@ -452,7 +452,7 @@ def build():
     data_json = data_json.replace("</", "<\\/")
 
     version = hashlib.sha1()
-    for f in ("styles.css", "app.js", "contact.js", "theme.js"):
+    for f in ("styles.css", "app.js", "contact.js", "theme.js", "motion.js", "logo.svg"):
         version.update((SRC / f).read_bytes())
 
     page = render((SRC / "index.html").read_text(encoding="utf-8"), {
@@ -463,6 +463,7 @@ def build():
         "logo_svg": logo_svg,
         "mark_svg": mark_svg,
         "theme_toggle": THEME_TOGGLE,
+        "motion": "on" if config.get("motion", True) else "off",
         "about_html": about_html,
         "services_html": services_html,
         "contact_html": "\n".join(contact_parts),

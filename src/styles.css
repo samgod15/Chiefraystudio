@@ -23,12 +23,15 @@
   --ink-faint: #82817b;
   --error: #ff9a8c;
   --axis: #63625e;
-  /* Safelight: the darkroom glow. One accent, passes 3:1 on grey and on paper. */
-  --ray: #e4522a;
-  --ray-bright: #ef6b45;
+  /* Safelight: the darkroom glow. --accent is the brand orange (the slashes);
+     --ray is the same orange for focus rings and underlines, deepened in light mode
+     so those stay easy to see on the pale walls. */
+  --accent: #ee6a43;
+  --ray: #ee6a43;
+  --ray-bright: #f4845a;
   /* The Contact button is the same Safelight pill in both modes. */
-  --cta: #e4522a;
-  --cta-hover: #ef6b45;
+  --cta: #ee6a43;
+  --cta-hover: #f4845a;
   --on-ray: #1b1b1a;
   /* Category highlighters: none in dark mode, pastel shades in light mode. */
   --hl-1: transparent; --hl-2: transparent; --hl-3: transparent; --hl-4: transparent;
@@ -133,7 +136,7 @@ img, svg { display: block; }
 
 .mark { display: inline-flex; padding: 2px; margin-left: -8px; }
 .mark-svg { width: 44px; height: 44px; color: var(--ink); }
-.mark-svg .slash, .logo .slash { stroke: var(--ray); }
+.mark-svg .slash, .logo .slash { stroke: var(--accent); }
 
 /* Header links: "/work /about" in the logo's font, Contact as the one button. */
 .site-nav {
@@ -212,14 +215,18 @@ img, svg { display: block; }
   line-height: 1.55;
 }
 
-/* One moment on load: the axis appears, then the slash shoots up through it. */
-@media (prefers-reduced-motion: no-preference) {
-  .wordmark::before { animation: fade-in 0.7s ease-out both; }
-  .wordmark .slash {
-    stroke-dasharray: 1;
-    animation: draw-ray 0.8s 0.3s cubic-bezier(0.25, 0.6, 0.2, 1) both;
-  }
-}
+/* Logo motion (motion.js): the viewfinder intro on load, then autofocus every
+   7 seconds. Each letter is its own shape so it can move. While the intro is
+   about to start the logo waits hidden; if the script never runs it shows
+   anyway after 2.5 s. */
+.wordmark .logo { cursor: pointer; }
+.logo .lt, .logo .sl-g { transform-box: fill-box; transform-origin: 50% 100%; }
+.logo .sl-g { transform-origin: 50% 50%; }
+.logo .af, .logo .vf-grid { fill: none; stroke: var(--ink-soft); stroke-width: 2.2px; opacity: 0; }
+.logo .vf-grid { stroke-width: 1.2px; }
+.shutter-blink { position: fixed; inset: 0; z-index: 55; background: #0d0d0c; opacity: 0; pointer-events: none; }
+:root.intro-wait .wordmark .logo { visibility: hidden; animation: show-late 0s 2.5s forwards; }
+@keyframes show-late { to { visibility: visible; } }
 @keyframes fade-in { from { opacity: 0; } }
 @keyframes draw-ray { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 
@@ -253,7 +260,7 @@ img, svg { display: block; }
   color: var(--ink-soft);
 }
 .cat:hover, .cat[aria-current="true"] { color: var(--ink); }
-.cat:hover .sl, .cat[aria-current="true"] .sl { color: var(--ray); }
+.cat:hover .sl, .cat[aria-current="true"] .sl { color: var(--accent); }
 @media (prefers-reduced-motion: no-preference) {
   .cat[aria-current="true"] .sl { animation: slash-in 0.45s cubic-bezier(0.3, 1.5, 0.5, 1) both; }
 }
@@ -313,7 +320,7 @@ img, svg { display: block; }
   top: 0;
   left: 0;
   display: block;
-  color: var(--ray);
+  color: var(--accent);
   font-family: var(--brand);
   font-weight: 700;
   letter-spacing: -0.015em;
@@ -573,7 +580,7 @@ img, svg { display: block; }
   letter-spacing: -0.02em;
   line-height: 1;
 }
-.about h2 .sl, .contact h2 .sl, .cp-faq h2 .sl { margin-right: 0.04em; color: var(--ray); }
+.about h2 .sl, .contact h2 .sl, .cp-faq h2 .sl { margin-right: 0.04em; color: var(--accent); }
 .about-body p {
   max-width: 33em;
   margin: 0 0 1em;
@@ -650,7 +657,7 @@ img, svg { display: block; }
   letter-spacing: -0.03em;
   line-height: 0.95;
 }
-.cp-intro h1 .sl { display: inline-block; margin-right: 0.03em; color: var(--ray); }
+.cp-intro h1 .sl { display: inline-block; margin-right: 0.03em; color: var(--accent); }
 @media (prefers-reduced-motion: no-preference) {
   .cp-intro h1 .sl { animation: slash-in 0.7s 0.1s cubic-bezier(0.3, 1.5, 0.5, 1) both; }
 }
@@ -662,7 +669,7 @@ img, svg { display: block; }
   line-height: 1.55;
 }
 .cp-note { margin: 0; font-family: var(--brand); font-weight: 700; font-size: 17px; }
-.cp-note .sl { margin-right: 0.25em; color: var(--ray); }
+.cp-note .sl { margin-right: 0.25em; color: var(--accent); }
 
 .cp-grid {
   display: grid;
@@ -809,7 +816,7 @@ select.cp-input option { background: var(--wall-deep); color: var(--ink); }
   line-height: 1;
 }
 .cp-sent-slash { width: 0.34em; height: 0.9em; margin: 0 0.04em -0.12em 0; overflow: visible; }
-.cp-sent-slash line { stroke: var(--ray); stroke-width: 7; }
+.cp-sent-slash line { stroke: var(--accent); stroke-width: 7; }
 @media (prefers-reduced-motion: no-preference) {
   .cp-sent-slash line { stroke-dasharray: 1; animation: draw-ray 0.7s 0.1s cubic-bezier(0.25, 0.6, 0.2, 1) both; }
   .cp-sent p, .cp-again { animation: fade-in 0.5s 0.5s ease-out both; }

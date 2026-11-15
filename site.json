@@ -36,6 +36,7 @@
   ],
 
   "nav_style": "path",
+  "motion": true,
   "show_camera_settings": true,
   "share_photo": "",
 
